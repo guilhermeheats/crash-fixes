@@ -34,6 +34,12 @@ Examples:
 
 If the launcher has a “game directory” or “instance folder” setting, that is the folder to use. The scripts do **not** read `instance.cfg` or `mmc-pack.json`.
 
+These fixes do not bypass launcher authentication. Current Prism, MultiMC,
+CurseForge, ATLauncher and GDLauncher builds require a Microsoft account that
+owns Minecraft before they will launch the game or add an offline profile.
+Legacy GDLauncher 1.1.30 can remain on `Loading...`; that is a launcher issue,
+not a fix failure.
+
 ## Linux / macOS
 
 ```bash

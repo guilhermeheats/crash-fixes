@@ -1,30 +1,122 @@
 # Testing status and manual checklist
 
+Last validation: **2026-11-18**.
+
+## Result summary
+
+The launcher-agnostic installers and verifiers pass on Linux and Windows. The
+1.6.4 + Forge game directory reaches the Minecraft main menu on both systems
+with `LegacyJavaFixer` and CustomChestLoot active.
+
+The remaining limitation is **launcher game launch**: current mainstream
+launchers require a Microsoft account that owns Minecraft. The Windows test VM
+has no such account. Prism 11 and MultiMC refuse to add an offline account
+without an owning Microsoft account, and ATLauncher, CurseForge and GDLauncher
+also require a login. The Windows game launch below was therefore started with
+the same Forge 1.6.4 classpath directly, using Java 8, to validate the game and
+the fixes without credentials.
+
 ## Matrix
 
-| Test | Linux | Windows | macOS |
+| Test | Linux | Windows 10 LTSC VM | macOS |
 |---|---|---|---|
-| Build `clchunkfix` (Java 7 bytecode) | Yes | GitHub Actions | GitHub Actions |
-| Repository checksums | Yes | GitHub Actions | GitHub Actions |
-| Script syntax / Python compile | Yes | PowerShell parser via Actions | Bash/Python via Actions |
-| Installer smoke test (generic game dir) | Yes | GitHub Actions | GitHub Actions |
-| Full game launch | Yes | **No real machine** | **No real machine** |
-| Death → new world cycle | Yes | **No real machine** | **No real machine** |
-| CustomChestLoot load | Yes | **No real machine** | **No real machine** |
+| Build `clchunkfix` (Java 7 bytecode) | Yes | CI | CI |
+| Repository checksums | Yes | Yes | CI |
+| PowerShell/Bash script syntax | Yes | Yes (PowerShell 5.1) | CI |
+| Installer against generic game dir | Yes | Yes | CI |
+| `verify-game-dir` | PASS | PASS | CI |
+| Runtime Forge/Java log check | PASS | PASS | Not run |
+| Full 1.6.4 + Forge launch to menu | Prism (copy) | Direct Forge jar | Not run |
+| `LegacyJavaFixer` loaded | Yes | Yes | Not run |
+| CustomChestLoot loaded | Yes | Yes | Not run |
+| Death → new world cycle | Yes (earlier run) | Not tested | Not tested |
 | Max video profile | Yes | Same file, not launched | Same file, not launched |
+| Launcher UI/runtime matrix | See below | See below | Not run |
 
-The development machine available for this project is Linux only. Windows and macOS are covered by CI for build/checksum/script/installer checks, but **not by an actual Minecraft launch**. This limitation is documented and not hidden.
+## Windows test environment
 
-## Linux evidence
+- VirtualBox 7.2.22, Windows 10 Enterprise LTSC 2021, build 19044.
+- VM: 5 GB RAM, 4 vCPU, 256 MB VRAM, VBoxSVGA, 3D acceleration enabled.
+- Guest Additions 7.2.20.
+- Java 8: Eclipse Temurin 1.8.0_512, 64-bit.
+- Java 17: Eclipse Temurin 17.0.21, 64-bit.
+- Shared folder `Z:` from the host; nothing was written to the real Prism
+  instance on the host.
+- GPU exposed as `VirtualBox Graphics Adapter (WDDM)`; the launch reports
+  `Mesa: SVGA3D` and reaches the game menu.
 
-- Install and verify against a real Crash Landing **game directory** without launcher metadata.
-- Launch through Prism as one launcher; the fix scripts do not read Prism files.
-- Death → new world cycles complete without the ChickenChunks/Ruins crash.
-- `[CLWorldFix]` lines appear on `FMLServerStopped`.
-- CustomChestLoot loads without `Invalid number of arguments!`.
-- Maximum video profile loads.
-- `verify-game-dir.sh` reports `Integrity check: PASS`.
-- No new crash report after the fixes.
+## Windows evidence
+
+- `install.ps1 -GameDir C:\CrashLandingTest -NoOptions` succeeded.
+- `verify-game-dir.ps1 -GameDir C:\CrashLandingTest` reported
+  `Integrity check: PASS`.
+- The same install/verify sequence passed under a CurseForge-style path with
+  spaces: `C:\Users\lab-win10\curseforge\minecraft\Instances\Crash Landing Test`.
+- The 1.6.4 launch log contains:
+  - `Forge Mod Loader version 6.4.49.965 for Minecraft 1.6.4`
+  - `Java is OpenJDK 64-Bit Server VM, version 1.8.0_512`
+  - `[LegacyJavaFixer] Replacing sort`
+  - `[CustomChestLoot] Loading custom chest loot...`
+  - `[CustomChestLoot] Done!`
+  - `Starting up SoundSystem...` and `OpenAL initialized.`
+- The game reached the main menu; no new crash report was created.
+
+The direct Windows launch is a test harness, not a normal installation method.
+It needs `-Dfml.ignoreInvalidMinecraftCertificates=true` and
+`-Dfml.ignorePatchDiscrepancies=true` because the classpath is assembled
+manually. Normal launchers pass these checks themselves.
+
+## Launcher matrix
+
+### Windows 10 LTSC
+
+| Launcher | Version | Runtime result | Game result |
+|---|---|---|---|
+| Prism Launcher | 11.1.1 portable | Quick Setup and account UI opened | Not launched: Prism 11 requires an owning Microsoft account and refused an offline profile |
+| MultiMC | 0.7.0-stable-3678 | Quick Setup and main window opened | Not launched: no account; offline CLI still required an account in this build |
+| ATLauncher | 3.4.42.0 | UI opened on Java 17.0.21; console reported 5119 MB RAM, 4 cores and the VirtualBox GPU | Not launched: account required |
+| GDLauncher | 1.1.30 (legacy Electron) | Window opened, stayed on `Loading...`; `--disable-gpu` did not change it; no error in `main.log` | Not launched |
+| CurseForge | 1.327.0 updater / app 0.220.1.9343 | Installer `/S` succeeded; Welcome screen opened; app auto-updated and reopened | Not launched: account required |
+
+The Prism and MultiMC instance folders were pointed at the test game directory
+with Windows junctions. The fix scripts did not read launcher metadata.
+
+### Linux
+
+| Launcher | Version | Runtime result | Game result |
+|---|---|---|---|
+| Prism Launcher | 11.1.1 Flatpak | Opened in an isolated root | **Yes**: a copy of the real game directory reached the 1.6.4 menu; `Integrity check: PASS` |
+| MultiMC | 0.7.0-stable-3673 | Quick Setup and main window opened | Not launched: no account; `-o -n TestPlayer` still stopped at the account prompt |
+| ATLauncher | 3.4.42.0 | UI opened on Temurin 17.0.21 | Not launched: account required |
+| GDLauncher | 1.1.30 AppImage | AppImage and FUSE worked; window stayed on `Loading...`; logged a read-only `7za` chmod error | Not launched |
+| Technic Launcher | 4.1180 | Installer UI opened on Temurin 17.0.21 | Not installed: default target was the real home directory; stopped to avoid modifying it |
+| CurseForge | — | No official Linux application | Not applicable |
+
+## Dependency checks
+
+| Dependency | Windows VM | Linux host |
+|---|---|---|
+| Java 8 64-bit | PASS: Temurin 1.8.0_512, used by Forge and the game | PASS: Prism JRE 8 used by the copy launch |
+| Java for the launcher | PASS: Temurin 17.0.21 for ATLauncher; Prism and MultiMC portable launchers ran | PASS: Temurin 17.0.21 for ATLauncher and Technic |
+| Minecraft 1.6.4 / Forge 9.11.1.965 | PASS in log | PASS in log |
+| OpenGL / 3D | PASS: `Mesa: SVGA3D`; game menu rendered | PASS: `glxinfo` direct rendering, AMD Radeon 610M / Mesa 24.3.3 |
+| Guest Additions | PASS: 7.2.20 | n/a |
+| Shared folder | PASS: `Z:` mounted read/write | n/a |
+| FUSE / AppImage | n/a | PASS: `/dev/fuse`, `fusermount3`; GDLauncher AppImage mounted and started |
+| Launcher runtimes | PASS for Prism, MultiMC, ATLauncher, GDLauncher and CurseForge (UI level) | PASS for Prism, MultiMC, ATLauncher, GDLauncher and Technic (UI/installer level) |
+
+## Why several launchers show no game launch
+
+This is an account limitation, not a fix failure. The test copy has a valid
+offline profile for Prism on Linux, which is why the Prism launch is real. On
+Windows there is no Microsoft account in the VM. We deliberately did not copy
+the host account tokens into the VM.
+
+To close that last gap, either:
+
+1. sign in to a Microsoft account in the VM, then launch through each launcher;
+2. or run the documented manual checklist on the real machine with the normal
+   account and report the result.
 
 ## Manual checklist (any launcher)
 
@@ -54,3 +146,6 @@ The development machine available for this project is Linux only. Windows and ma
 - `EnviroMine Unable to get EnviroTracker for GUI`.
 - Missing textures in old mods.
 - `missing pack.mcmeta` warnings.
+- `You'll need a new app to open this ms-gamingoverlay link` on Windows when
+  the Xbox Game Bar URI handler is not installed. It is a Windows shell dialog;
+  the game still reaches the main menu.

@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased — launcher/dependency validation
+
+- Windows 10 LTSC VM: `install.ps1` and `verify-game-dir.ps1` PASS, including a
+  CurseForge-style path with spaces.
+- Windows: Minecraft 1.6.4 + Forge 9.11.1.965 + Java 8 reached the main menu;
+  `LegacyJavaFixer`, CustomChestLoot and OpenAL initialized; no new crash report.
+- Runtime checks for Prism, MultiMC, ATLauncher, GDLauncher, CurseForge,
+  Technic, FUSE/AppImage, OpenGL/3D, Guest Additions and the shared folder.
+- Documented that current launchers require a Microsoft account owning Minecraft
+  to launch the game, and that legacy GDLauncher 1.1.30 can hang at `Loading...`.
+- No fix jar or pack asset changed.
+
 ## v2.0.1 — 1.6.4 log verification
 
 - `verify-game-dir` now checks `ForgeModLoader-client-0.log` (the 1.6.4 log) as well as `logs/latest.log`.

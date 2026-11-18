@@ -148,11 +148,11 @@ Allow intentional extra mods:
 
 | Platform | Status |
 |---|---|
-| Linux | Installer/verifier tested against a real Crash Landing game directory; game launch and death → new world cycles tested via Prism as one launcher, with no Prism metadata required by the scripts |
-| Windows | PowerShell installer/verifier and build tested by GitHub Actions; no real Windows machine available for a full game launch |
+| Linux | Installer/verifier tested against a real Crash Landing game directory; game launch and death → new world cycles tested via Prism as one launcher, with no Prism metadata required by the scripts. Prism, MultiMC, ATLauncher, GDLauncher and the Technic installer were also exercised at runtime level. |
+| Windows | PowerShell 5.1 installer/verifier PASS in a Windows 10 LTSC VM; full Minecraft 1.6.4 + Forge 9.11.1.965 launch reached the main menu with `LegacyJavaFixer` and CustomChestLoot. Prism, MultiMC, ATLauncher, GDLauncher and CurseForge were exercised at runtime level. Launcher game launch needs a Microsoft account owning Minecraft; the VM has none. |
 | macOS | Bash installer/verifier and build tested by GitHub Actions; no real Mac available for a full game launch |
 
-The CI matrix runs on Ubuntu, Windows and macOS and includes installer smoke tests. Full game launch on Windows/macOS still needs a real machine or VM; see [docs/TESTING.md](docs/TESTING.md).
+The CI matrix runs on Ubuntu, Windows and macOS and includes installer smoke tests. The Windows full game launch used a test game directory and the same Forge classpath directly; current launchers require a Microsoft account to start the game. See [docs/TESTING.md](docs/TESTING.md) for the launcher matrix and evidence.
 
 ## Performance / OptiFine
 
