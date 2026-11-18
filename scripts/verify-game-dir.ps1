@@ -68,19 +68,24 @@ else {
     if ($missing.Count -eq 0 -and $extra.Count -eq 0) { Ok "no unexpected mods" }
 }
 
-$log = Join-Path $GameDir "logs\latest.log"
-if (Test-Path -LiteralPath $log) {
+$logCandidates = @(
+    (Join-Path $GameDir "logs\latest.log"),
+    (Join-Path $GameDir "ForgeModLoader-client-0.log")
+)
+$log = $logCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+if ($log) {
     $text = Get-Content -LiteralPath $log -Raw
+    $logName = Split-Path -Leaf $log
     if ($text -match 'Forge Mod Loader version 6\.4\.49\.965 for Minecraft 1\.6\.4' -or
         $text -match 'Minecraft Forge 9\.11\.1\.965') {
-        Ok "latest.log reports Minecraft 1.6.4 + Forge 9.11.1.965"
+        Ok "$logName reports Minecraft 1.6.4 + Forge 9.11.1.965"
     }
-    else { Warn "latest.log present, but expected Forge/Minecraft version not found" }
-    if ($text -match 'Java is .*version 1\.8\.') { Ok "latest.log reports Java 8" }
-    else { Warn "latest.log does not clearly report Java 8" }
+    else { Warn "$logName present, but expected Forge/Minecraft version not found" }
+    if ($text -match 'Java is .*version 1\.8\.') { Ok "$logName reports Java 8" }
+    else { Warn "$logName does not clearly report Java 8" }
 }
 else {
-    Warn "logs/latest.log not found; Forge/Java version cannot be verified"
+    Warn "No 1.6.4 log found (ForgeModLoader-client-0.log or logs/latest.log); Forge/Java version cannot be verified"
 }
 
 $options = Join-Path $GameDir "options.txt"

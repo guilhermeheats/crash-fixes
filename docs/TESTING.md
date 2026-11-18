@@ -35,7 +35,7 @@ The development machine available for this project is Linux only. Windows and ma
    - Windows: `.\scripts\install.ps1 -GameDir "<dir>"`
 4. Set Java 8 and the JVM arguments from `docs/INSTALL.md`.
 5. Launch the pack.
-6. Confirm the main menu and `LegacyJavaFixer` in `logs/latest.log`.
+6. Confirm the main menu and `LegacyJavaFixer` in `ForgeModLoader-client-0.log` (1.6.4) or `logs/latest.log`.
 7. Create/enter a world, quit to title, re-enter; check `[CLWorldFix]`.
 8. If testing hardcore: die, create the next world, confirm no `loginTimes.dat`/`RuinsPositionsFile.txt` crash.
 9. Run `verify-game-dir.sh`/`.ps1`.

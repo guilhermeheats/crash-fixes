@@ -121,22 +121,29 @@ PY
 fi
 
 # Optional runtime log checks. These prove the Forge/Java versions without
-# requiring any launcher metadata.
-LOG="$GAME_DIR/logs/latest.log"
-if [ -f "$LOG" ]; then
+# requiring any launcher metadata. 1.6.4 uses ForgeModLoader-client-0.log;
+# newer versions use logs/latest.log.
+LOG=""
+for candidate in "$GAME_DIR/logs/latest.log" "$GAME_DIR/ForgeModLoader-client-0.log"; do
+    if [ -f "$candidate" ]; then
+        LOG="$candidate"
+        break
+    fi
+done
+if [ -n "$LOG" ]; then
     if grep -q 'Forge Mod Loader version 6.4.49.965 for Minecraft 1.6.4' "$LOG" ||
        grep -q 'Minecraft Forge 9.11.1.965' "$LOG"; then
-        ok "latest.log reports Minecraft 1.6.4 + Forge 9.11.1.965"
+        ok "$(basename "$LOG") reports Minecraft 1.6.4 + Forge 9.11.1.965"
     else
-        warn "latest.log present, but the expected Forge/Minecraft version was not found"
+        warn "$(basename "$LOG") present, but the expected Forge/Minecraft version was not found"
     fi
     if grep -q 'Java is .*version 1\.8\.' "$LOG"; then
-        ok "latest.log reports Java 8"
+        ok "$(basename "$LOG") reports Java 8"
     else
-        warn "latest.log does not clearly report Java 8"
+        warn "$(basename "$LOG") does not clearly report Java 8"
     fi
 else
-    warn "logs/latest.log not found; Forge/Java version cannot be verified"
+    warn "No 1.6.4 log found (ForgeModLoader-client-0.log or logs/latest.log); Forge/Java version cannot be verified"
 fi
 
 if [ -f "$ROOT/examples/options.txt" ] && [ -f "$GAME_DIR/options.txt" ]; then

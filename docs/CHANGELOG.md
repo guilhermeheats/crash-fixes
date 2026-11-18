@@ -1,10 +1,16 @@
 # Changelog
 
+## v2.0.1 — 1.6.4 log verification
+
+- `verify-game-dir` now checks `ForgeModLoader-client-0.log` (the 1.6.4 log) as well as `logs/latest.log`.
+- This makes the runtime Forge/Java check work on actual 1.6.4 launches.
+- Verified on Linux with a copy of a real Crash Landing game directory: menu launch, `LegacyJavaFixer`, CustomChestLoot and `Integrity check: PASS`.
+
 ## v2.0.0 — launcher-agnostic
 
 - Removed the Prism Launcher dependency from installers and verifiers.
 - Installers now take a generic Minecraft **game directory** (`--game-dir` / `-GameDir`) containing `mods/`, `config/`, `saves/` and `options.txt`.
-- Verification no longer requires `instance.cfg` or `mmc-pack.json`; it checks the game directory, mod manifest, options and optional `logs/latest.log`.
+- Verification no longer requires `instance.cfg` or `mmc-pack.json`; it checks the game directory, mod manifest, options and optional 1.6.4 log (`ForgeModLoader-client-0.log` or `logs/latest.log`).
 - JVM arguments are documented for each launcher instead of being written into a Prism config.
 - Added full `CREDITS.md` including all pack mod authors.
 - Rebuilt `clchunkfix-1.1.jar` with the correct author metadata.

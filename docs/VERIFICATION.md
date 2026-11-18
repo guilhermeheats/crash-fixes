@@ -59,9 +59,9 @@ It checks:
 - every mod against `mods.sha256`;
 - missing/extra mods;
 - `options.txt` against `examples/options.txt` (warning only);
-- if `logs/latest.log` exists, Minecraft 1.6.4, Forge 9.11.1.965 and Java 8.
+- if a runtime log exists (`ForgeModLoader-client-0.log` on 1.6.4, or `logs/latest.log`), Minecraft 1.6.4, Forge 9.11.1.965 and Java 8.
 
-It does **not** require `instance.cfg`, `mmc-pack.json`, a specific launcher, or a specific Java path. If `logs/latest.log` is absent, the runtime version check is a warning; launch the game once and re-run.
+It does **not** require `instance.cfg`, `mmc-pack.json`, a specific launcher, or a specific Java path. If no runtime log is found, the version check is a warning; launch the game once and re-run.
 
 Allow extra mods intentionally:
 
@@ -82,7 +82,7 @@ Integrity check: PASS
 A game directory that has not been launched yet may show:
 
 ```text
-WARN logs/latest.log not found; Forge/Java version cannot be verified
+WARN No 1.6.4 log found (ForgeModLoader-client-0.log or logs/latest.log); Forge/Java version cannot be verified
 ```
 
 That is expected until the first launch.

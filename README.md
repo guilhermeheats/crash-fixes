@@ -132,7 +132,7 @@ It checks:
 - all 63 mod files against `mods.sha256`;
 - extra/missing mods;
 - `options.txt` against the reference profile;
-- if `logs/latest.log` exists, Minecraft 1.6.4, Forge 9.11.1.965 and Java 8.
+- if a runtime log exists (`ForgeModLoader-client-0.log` on 1.6.4, or `logs/latest.log`), Minecraft 1.6.4, Forge 9.11.1.965 and Java 8.
 
 Allow intentional extra mods:
 
