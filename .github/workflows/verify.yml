@@ -1,0 +1,62 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Verify repository (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          ./scripts/verify.sh
+          bash -n scripts/*.sh
+          python3 -m py_compile scripts/*.py
+
+      - name: Build clchunkfix (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/forge.jar" \
+            https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.965/forge-1.6.4-9.11.1.965-universal.jar
+          FORGE_JAR="$RUNNER_TEMP/forge.jar" ./scripts/build.sh
+          test -f mods/clchunkfix-1.1.jar
+
+      - name: Verify repository (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem scripts/*.ps1 | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName, [ref]$tokens, [ref]$errors
+            )
+            if ($errors.Count -gt 0) {
+              $errors | Format-List
+              throw "PowerShell parse error in $($_.Name)"
+            }
+          }
+          .\scripts\verify.ps1
+
+      - name: Build clchunkfix (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          .\scripts\build.ps1
+          if (-not (Test-Path mods/clchunkfix-1.1.jar)) { throw "jar not built" }
