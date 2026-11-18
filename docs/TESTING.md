@@ -7,7 +7,7 @@
 | Build `clchunkfix` (Java 7 bytecode) | Yes | GitHub Actions | GitHub Actions |
 | Repository checksums | Yes | GitHub Actions | GitHub Actions |
 | Script syntax / Python compile | Yes | PowerShell parser via Actions | Bash/Python via Actions |
-| Installer on a fixture | Yes | Pending real machine | Pending real machine |
+| Installer on a fixture | Yes | CI smoke test | CI smoke test |
 | Full game launch | Yes | **No real machine** | **No real machine** |
 | Death → new world cycle | Yes (Crash Landing 4 → 5) | **No real machine** | **No real machine** |
 | CustomChestLoot load | Yes | **No real machine** | **No real machine** |

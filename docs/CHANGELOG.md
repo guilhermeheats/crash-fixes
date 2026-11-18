@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.1 — CI installer smoke tests
+
+- GitHub Actions now smoke-tests the Linux/macOS and Windows installers on fixture instances.
+- CI matrix passes on Ubuntu, Windows and macOS.
+- Release assets unchanged: `clchunkfix-1.1.jar`, `legacyjavafixer-1.0.jar`, checksums, mod manifest, reference options.
+
 ## v1.3.0 — public release
 
 - Public repository with clean history; no modpack redistribution.
