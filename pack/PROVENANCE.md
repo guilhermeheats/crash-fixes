@@ -10,6 +10,6 @@ This repository does **not** contain the Crash Landing modpack.
 - SHA-256: `42996d8105bcea94460ca334f848343ea2f3e2dd47d2597d159418dd93e5071b`
 - Size: 27,219,872 bytes
 
-The pack is **All Rights Reserved**. Download it from the official source and install it in Prism Launcher. Do not redistribute it publicly.
+The pack is **All Rights Reserved**. Download it from the official source and install it with your launcher. Do not redistribute it publicly.
 
-After installing it, run `scripts/install.sh` (Linux/macOS) or `scripts/install.ps1` (Windows) on the instance.
+After installing it, run `scripts/install.sh --game-dir <dir>` (Linux/macOS) or `scripts/install.ps1 -GameDir <dir>` (Windows) against the game directory.

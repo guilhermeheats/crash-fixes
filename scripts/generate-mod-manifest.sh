@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
-# Regenerate mods.sha256 from an installed Crash Landing instance.
+# Regenerate mods.sha256 from any Minecraft game directory.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-INSTANCE="${1:-${INSTANCE:-$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/Crash Landing}}"
-MODS="$INSTANCE/minecraft/mods"
+GAME_DIR="${1:-${GAME_DIR:-${MINECRAFT_DIR:-}}}"
 
+if [ -z "$GAME_DIR" ]; then
+    echo "Usage: generate-mod-manifest.sh --game-dir <dir>" >&2
+    exit 2
+fi
+GAME_DIR="${GAME_DIR%/}"
+MODS="$GAME_DIR/mods"
 if [ ! -d "$MODS" ]; then
     echo "Mods directory not found: $MODS" >&2
     exit 1

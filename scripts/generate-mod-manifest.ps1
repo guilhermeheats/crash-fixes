@@ -1,25 +1,12 @@
 #!/usr/bin/env pwsh
 param(
-    [string]$Instance = ""
+    [Parameter(Mandatory = $true)]
+    [string]$GameDir
 )
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
-if ([string]::IsNullOrWhiteSpace($Instance)) {
-    $candidates = @(
-        (Join-Path $env:APPDATA "PrismLauncher\instances\Crash Landing"),
-        (Join-Path $env:LOCALAPPDATA "PrismLauncher\instances\Crash Landing")
-    )
-    foreach ($candidate in $candidates) {
-        if (Test-Path -LiteralPath (Join-Path $candidate "instance.cfg")) {
-            $Instance = $candidate
-            break
-        }
-    }
-}
-if ([string]::IsNullOrWhiteSpace($Instance)) { throw "Pass -Instance 'C:\path\to\instances\Crash Landing'." }
-
-$mods = Join-Path $Instance "minecraft\mods"
+$mods = Join-Path $GameDir "mods"
 if (-not (Test-Path -LiteralPath $mods)) { throw "Mods directory not found: $mods" }
 
 $lines = Get-ChildItem -LiteralPath $mods -File | Where-Object {

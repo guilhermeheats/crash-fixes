@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Download the official Crash Landing 1.1.3 pack file for Prism installation.
+# Download the official Crash Landing 1.1.3 pack file for your launcher.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,10 +21,9 @@ fi
 
 if [ "$ACTUAL" != "$EXPECTED" ]; then
     echo "SHA-256 mismatch for $DEST" >&2
-    echo "expected: $EXPECTED" >&2
-    echo "actual:   $ACTUAL" >&2
     exit 1
 fi
 
 echo "Pack file: $DEST"
-echo "Install it in Prism, then run scripts/install.sh on the instance."
+echo "Install it with your launcher, then run:"
+echo "  ./scripts/install.sh --game-dir <game-dir>"

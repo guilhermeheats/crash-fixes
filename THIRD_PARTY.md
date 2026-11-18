@@ -20,6 +20,10 @@
 - Not included. They are part of the Crash Landing pack.
 - `clchunkfix` uses the public `ChunkLoaderManager.serverShutdown()` method and reflection on Ruins' private `generatorMap` at runtime.
 
+## Full credits
+
+See `CREDITS.md` for the pack team, every mod author, tooling and special thanks. This file only covers the third-party components that are directly relevant to the fixes.
+
 ## Minecraft and Forge
 
 - Not redistributed. Minecraft is property of Mojang/Microsoft; Forge is property of its authors.

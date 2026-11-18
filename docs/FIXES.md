@@ -1,6 +1,6 @@
 # Technical fixes
 
-Target: **Crash Landing 1.1.3**, Minecraft 1.6.4, Forge 9.11.1.965, Java 8u202 64-bit, Prism Launcher 11.x.
+Target: **Crash Landing 1.1.3**, Minecraft 1.6.4, Forge 9.11.1.965, Java 8, any launcher that can run the pack.
 
 ## 1. LaunchWrapper `ConcurrentModificationException`
 

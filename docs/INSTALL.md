@@ -2,116 +2,143 @@
 
 ## Prerequisites
 
-1. Install **Prism Launcher 11.x**.
-2. Install **Crash Landing 1.1.3** from CurseForge in Prism:
-   - project ID: `229330`
+1. Install **Minecraft 1.6.4 + Forge 9.11.1.965** with any launcher.
+2. Install **Crash Landing 1.1.3** with that launcher:
+   - CurseForge project ID: `229330`
    - file: `CrashLanding-1.1.3-1.6.4.zip`
    - file ID: `2235312`
-3. Let Prism download/select **Java 8 64-bit** for the instance.
+3. Use **Java 8 64-bit**.
 4. Download or clone this repository.
 
-Do not install OptiFine. Do not update Forge.
+No specific launcher is required. Prism, CurseForge, MultiMC, ATLauncher, GDLauncher, the vanilla launcher and others are all fine, as long as the pack runs.
 
-## Prism instance paths
+## Game directory
 
-Use these paths to find the instance directory:
+The installer targets the folder that directly contains:
 
-| OS | Typical path |
+```
+mods/
+config/
+saves/
+options.txt
+```
+
+Examples:
+
+| Launcher | Typical game directory |
 |---|---|
-| Linux Flatpak | `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/Crash Landing` |
-| Linux native | `~/.local/share/PrismLauncher/instances/Crash Landing` |
-| macOS | `~/Library/Application Support/PrismLauncher/instances/Crash Landing` |
-| Windows | `%APPDATA%\PrismLauncher\instances\Crash Landing` |
+| Prism / MultiMC | `instances/<pack>/minecraft` |
+| CurseForge App | the instance folder that contains `mods/` |
+| ATLauncher / GDLauncher | the instance folder |
+| Vanilla launcher | `%APPDATA%\.minecraft`, `~/.minecraft`, `~/Library/Application Support/minecraft` |
 
-The instance directory must contain `instance.cfg`, `mmc-pack.json` and `minecraft/`.
+If the launcher has a “game directory” or “instance folder” setting, that is the folder to use. The scripts do **not** read `instance.cfg` or `mmc-pack.json`.
 
 ## Linux / macOS
 
-The installer detects the common Prism paths. If it cannot find the instance, pass `INSTANCE`.
-
 ```bash
-INSTANCE="$HOME/.local/share/PrismLauncher/instances/Crash Landing" \
-  ./scripts/install.sh
+./scripts/install.sh --game-dir "/path/to/game-dir"
 ```
 
-Flatpak:
+Keep the current video settings:
 
 ```bash
-INSTANCE="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/Crash Landing" \
-  ./scripts/install.sh
+./scripts/install.sh --game-dir "/path/to/game-dir" --no-options
 ```
 
-macOS:
+The installer:
 
-```bash
-INSTANCE="$HOME/Library/Application Support/PrismLauncher/instances/Crash Landing" \
-  ./scripts/install.sh
-```
+1. copies `legacyjavafixer-1.0.jar` and `clchunkfix-1.1.jar` to `mods/`;
+2. backs up and applies `examples/options.txt` (unless `--no-options`);
+3. fixes the CustomChestLoot configs;
+4. disables obsolete update/radio checks;
+5. prints the recommended JVM arguments.
 
-The script:
-
-1. copies `legacyjavafixer-1.0.jar` and `clchunkfix-1.1.jar` to `minecraft/mods`;
-2. sets 4 GB + G1GC in `instance.cfg`;
-3. backs up and applies `examples/options.txt` (max fidelity);
-4. fixes CustomChestLoot and disables obsolete network checks.
-
-Preserve your current video options:
-
-```bash
-APPLY_OPTIONS=0 INSTANCE="..." ./scripts/install.sh
-```
+It does not modify launcher-specific files.
 
 ## Windows
 
 PowerShell 5.1+ is built into Windows 10/11.
 
 ```powershell
-.\scripts\install.ps1 -Instance "C:\Users\<you>\AppData\Roaming\PrismLauncher\instances\Crash Landing"
+.\scripts\install.ps1 -GameDir "C:\path\to\game-dir"
 ```
 
-Preserve your current video options:
+Keep the current video settings:
 
 ```powershell
-.\scripts\install.ps1 -Instance "..." -NoOptions
+.\scripts\install.ps1 -GameDir "C:\path\to\game-dir" -NoOptions
 ```
-
-The PowerShell script does the same steps as the bash installer without requiring Python.
 
 ## Manual installation
 
-Copy these files into `minecraft/mods`:
+Copy into `mods/`:
 
 - `mods/legacyjavafixer-1.0.jar`
 - `mods/clchunkfix-1.1.jar`
 
-Then apply the configuration fixes manually:
+Then apply config fixes:
 
 ```bash
-python3 scripts/fix-customchestloot.py "<instance>/minecraft/config/CustomChestLoot"
-python3 scripts/cleanup-network-checks.py "<instance>/minecraft"
+python3 scripts/fix-customchestloot.py "<game-dir>/config/CustomChestLoot"
+python3 scripts/cleanup-network-checks.py "<game-dir>"
 ```
 
-Windows equivalents:
+Windows:
 
 ```powershell
-.\scripts\fix-customchestloot.ps1 -ConfigDir "<instance>\minecraft\config\CustomChestLoot"
-.\scripts\cleanup-network-checks.ps1 -MinecraftDir "<instance>\minecraft"
+.\scripts\fix-customchestloot.ps1 -ConfigDir "<game-dir>\config\CustomChestLoot"
+.\scripts\cleanup-network-checks.ps1 -MinecraftDir "<game-dir>"
 ```
 
-Optionally copy `examples/options.txt` to `minecraft/options.txt` (back up the old file first).
+Optionally copy `examples/options.txt` to `<game-dir>/options.txt` after backing up the old file.
+
+## JVM arguments
+
+Set these in the launcher's Java/JVM arguments field:
+
+```text
+-Xms4096m -Xmx4096m
+-XX:+UseG1GC
+-XX:+UnlockExperimentalVMOptions
+-XX:G1NewSizePercent=20
+-XX:G1ReservePercent=20
+-XX:MaxGCPauseMillis=50
+-XX:G1HeapRegionSize=32M
+-XX:+DisableExplicitGC
+-XX:+ParallelRefProcEnabled
+-XX:+PerfDisableSharedMem
+```
+
+Menu names vary:
+
+- Prism/MultiMC: Instance Settings → Java → JVM arguments
+- CurseForge App: instance settings/Java or profile arguments
+- ATLauncher: Settings → Java/Memory
+- GDLauncher: instance settings
+- Vanilla launcher: profile → More Options → JVM arguments
+
+The installer prints the same block after installation.
 
 ## After installation
 
-1. Restart Prism.
-2. Launch the instance.
-3. Confirm Java 8 in **Instance Settings → Java**.
-4. Check the log for `LegacyJavaFixer` and `[CLWorldFix]` lines after leaving a world.
-5. Run `scripts/verify-instance.sh` / `.ps1` for integrity.
+1. Restart the launcher.
+2. Select Java 8 64-bit.
+3. Launch the pack.
+4. Verify with:
 
-## Updating the pack
+```bash
+./scripts/verify-game-dir.sh --game-dir "<game-dir>"
+```
 
-If Prism updates/reinstalls the pack, re-run the installer and confirm both jars are still present. Pack updates can overwrite `config/` and `options.txt`.
+```powershell
+.\scripts\verify-game-dir.ps1 -GameDir "C:\path\to\game-dir"
+```
+
+## Pack updates
+
+If the launcher updates/reinstalls the pack, re-run the installer and confirm both jars are still in `mods/`. Pack updates can overwrite `config/` and `options.txt`.
 
 ## No backup
 
-This project does not create world backups. Crash Landing's hardcore world deletion is intentional. If you want backups, that is a separate decision and is not included here.
+This project does not create world backups. Crash Landing's hardcore world deletion is intentional. Backup is a separate decision and is not included.

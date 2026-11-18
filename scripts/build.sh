@@ -5,8 +5,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="1.1"
 JAR_NAME="clchunkfix-${VERSION}.jar"
-DEFAULT_FORGE="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries/net/minecraftforge/forge/1.6.4-9.11.1.965/forge-1.6.4-9.11.1.965-universal.jar"
-FORGE_JAR="${FORGE_JAR:-$DEFAULT_FORGE}"
+FORGE_JAR="${FORGE_JAR:-}"
+
+if [ -z "$FORGE_JAR" ]; then
+    echo "Set FORGE_JAR to the Forge 1.6.4-9.11.1.965 universal jar." >&2
+    echo "Download: https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.965/forge-1.6.4-9.11.1.965-universal.jar" >&2
+    exit 1
+fi
 ECJ_VERSION="3.33.0"
 ECJ_URL="https://repo1.maven.org/maven2/org/eclipse/jdt/ecj/${ECJ_VERSION}/ecj-${ECJ_VERSION}.jar"
 ECJ_JAR="$ROOT/build/ecj.jar"

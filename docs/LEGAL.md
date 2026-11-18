@@ -26,7 +26,12 @@ This project is **unofficial** and is not affiliated with or endorsed by:
 - the Crash Landing authors;
 - CurseForge;
 - Mojang or Microsoft;
-- OptiFine or its author.
+- OptiFine or its author;
+- any launcher vendor.
+
+It is launcher-agnostic: users keep their existing launcher and only install the fixes into their game directory.
+
+See `CREDITS.md` for the full credits.
 
 ## LegacyJavaFixer
 

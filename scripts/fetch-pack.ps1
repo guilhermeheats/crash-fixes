@@ -22,4 +22,5 @@ if (-not (Test-Path -LiteralPath $Destination)) {
 $actual = (Get-FileHash -LiteralPath $Destination -Algorithm SHA256).Hash.ToLower()
 if ($actual -ne $sha256) { throw "SHA-256 mismatch: $actual" }
 Write-Host "Pack file: $Destination"
-Write-Host "Install it in Prism, then run scripts\install.ps1 on the instance."
+Write-Host "Install it with your launcher, then run:"
+Write-Host "  .\scripts\install.ps1 -GameDir <game-dir>"

@@ -63,7 +63,7 @@ OptiFine's license also forbids modifying/redistributing the jar. See `docs/LEGA
 
 - Lower Render Distance to Normal/Short.
 - Test fullscreen vs windowed.
-- Use the discrete GPU on hybrid laptops (`UseDiscreteGpu` in Prism or `DRI_PRIME=1` on Linux).
+- Use the discrete GPU on hybrid laptops (the launcher's GPU option, or `DRI_PRIME=1` on Linux).
 - Close background applications; the instance uses a 4 GB heap.
 - Do not raise the heap above 5 GB without evidence; larger heaps can increase GC pauses.
 
