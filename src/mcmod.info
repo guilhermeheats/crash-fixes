@@ -2,11 +2,11 @@
   {
     "modid": "clchunkfix",
     "name": "Crash Landing World Switch Fixes",
-    "description": "Resets stale ChickenChunks and Ruins world state when the integrated server stops, preventing crashes and wrong RuinsPositionsFile paths after switching worlds in Crash Landing.",
-    "version": "1.1",
+    "description": "Resets stale ChickenChunks and Ruins world state when the integrated server stops, and guards CodeChickenLib against worlds missing from its world-extension map. Prevents crashes and wrong RuinsPositionsFile paths after switching worlds in Crash Landing.",
+    "version": "1.2",
     "mcversion": "1.6.4",
     "authorList": ["guilhermeheats"],
-    "credits": "ChickenChunks fix tested with Crash Landing 1.1.3; Ruins reset added in 1.1.",
+    "credits": "ChickenChunks fix tested with Crash Landing 1.1.3; Ruins reset added in 1.1; CodeChickenLib worldMap guard added in 1.2.",
     "logoFile": "",
     "parent": ""
   }

@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.1.0 — CodeChickenLib world tick guard
+
+- `clchunkfix-1.2.jar` adds a coremod guard for CodeChickenLib 1.0.0.62.
+- Fixes the `WorldExtensionManager.preTick` `NullPointerException` that stops
+  the integrated server tick loop (frozen mobs, chests that no longer open).
+- The guard creates missing world-extension state on demand, with an empty
+  extension set as a safe fallback.
+- Installers remove older `clchunkfix-1.0.jar` and `clchunkfix-1.1.jar`.
+- Verified with a synthetic unregistered-world call (`preTick` NPE before,
+  no NPE after), a Linux client launch to the main menu with 102 mods, and a
+  Windows 10 LTSC launch with 102 mods plus `verify-game-dir.ps1` PASS.
+- No pack, mod, recipe, loot or world data is redistributed or changed.
+
 ## Unreleased — launcher/dependency validation
 
 - Windows 10 LTSC VM: `install.ps1` and `verify-game-dir.ps1` PASS, including a

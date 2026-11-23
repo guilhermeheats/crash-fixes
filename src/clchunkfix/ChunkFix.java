@@ -21,8 +21,11 @@ import java.util.Map;
  *  - ChickenChunks 1.3.3.4: stale saveDir -> loginTimes.dat crash
  *  - Ruins 11.0: stale generatorMap -> writes/loads RuinsPositionsFile.txt
  *    from the previous world
+ *  - CodeChickenLib 1.0.0.62: a world ticked without a worldMap entry
+ *    -> NullPointerException in WorldExtensionManager.preTick, which stops
+ *    the integrated server tick loop (frozen mobs, chests not opening)
  */
-@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.1")
+@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.2")
 public class ChunkFix {
 
     @Mod.EventHandler

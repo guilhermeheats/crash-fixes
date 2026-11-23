@@ -16,6 +16,36 @@ also require a login. The Windows game launch below was therefore started with
 the same Forge 1.6.4 classpath directly, using Java 8, to validate the game and
 the fixes without credentials.
 
+## CodeChickenLib tick-guard validation (v1.2)
+
+The real instance produced this crash report on 2026-11-22:
+
+```text
+Description: Exception in server tick loop
+java.lang.NullPointerException
+    at codechicken.lib.world.WorldExtensionManager.preTick(WorldExtensionManager.java:239)
+```
+
+Line 239 is `worldMap.get(world)`. The integrated server then stops ticking,
+which matches the reported frozen mobs and unopenable chest.
+
+Validation performed:
+
+- A synthetic Java 8 test allocated an unregistered `World` and invoked
+  `WorldExtensionManager.preTick` directly.
+  - Original class: `THREW java.lang.NullPointerException`.
+  - Patched class: `[CLWorldFix] Created missing CodeChickenLib world extensions on demand.` and `NO_NPE`.
+- A Linux client launch used a copy of the game directory with
+  `clchunkfix-1.2.jar`. The log shows:
+  - `Registering transformer clchunkfix.core.WorldExtensionTransformer`
+  - `[CLWorldFix] Patched CodeChickenLib WorldExtensionManager tick guard.`
+  - `Forge Mod Loader has successfully loaded 102 mods`
+  - the main menu rendered with 102 mods active.
+- The real Prism instance and its save were not modified.
+
+The exact chest-breaking sequence in the affected save was not replayed
+automatically; the unit test exercises the same `preTick` null path.
+
 ## Matrix
 
 | Test | Linux | Windows 10 LTSC VM | macOS |
@@ -52,6 +82,10 @@ the fixes without credentials.
   `Integrity check: PASS`.
 - The same install/verify sequence passed under a CurseForge-style path with
   spaces: `C:\Users\lab-win10\curseforge\minecraft\Instances\Crash Landing Test`.
+- With `clchunkfix-1.2.jar`, the launch log contains
+  `Registering transformer clchunkfix.core.WorldExtensionTransformer`,
+  `[CLWorldFix] Patched CodeChickenLib WorldExtensionManager tick guard.` and
+  `Forge Mod Loader has successfully loaded 102 mods`.
 - The 1.6.4 launch log contains:
   - `Forge Mod Loader version 6.4.49.965 for Minecraft 1.6.4`
   - `Java is OpenJDK 64-Bit Server VM, version 1.8.0_512`
