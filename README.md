@@ -158,7 +158,7 @@ Allow intentional extra mods:
 | Windows | PowerShell 5.1 installer/verifier PASS in a Windows 10 LTSC VM; full Minecraft 1.6.4 + Forge 9.11.1.965 launch reached the main menu with `LegacyJavaFixer` and CustomChestLoot. Prism, MultiMC, ATLauncher, GDLauncher and CurseForge were exercised at runtime level. Launcher game launch needs a Microsoft account owning Minecraft; the VM has none. |
 | macOS | Bash installer/verifier and build tested by GitHub Actions; no real Mac available for a full game launch |
 
-The CI matrix runs on Ubuntu, Windows and macOS and includes installer smoke tests. The Windows full game launch used a test game directory and the same Forge classpath directly; current launchers require a Microsoft account to start the game. See [docs/TESTING.md](docs/TESTING.md) for the launcher matrix and evidence.
+The CI matrix runs on Ubuntu, Windows and macOS and includes installer smoke tests. The Windows full game launch used a test game directory and the same Forge classpath directly; current launchers require a Microsoft account to start the game. See [docs/TESTING.md](docs/TESTING.md) for the launcher matrix and evidence. Known benign log messages, fixed issues and open pack-asset issues are listed in [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 
 ## Performance / OptiFine
 
@@ -197,7 +197,7 @@ src/                   clchunkfix source + mcmod.info
 examples/options.txt   max-fidelity video profile
 mods.sha256            hashes of the 63 mod files in a Crash Landing 1.1.3 instance
 scripts/               install/verify/build/maintenance scripts (bash + PowerShell + Python)
-docs/                  install, fixes, verification, performance, testing, legal
+docs/                  install, fixes, verification, performance, testing, known issues, legal
 pack/PROVENANCE.md     official pack URL and SHA-256 (no pack file)
 .github/workflows/     CI matrix and release workflow
 checksums.txt          repository artifact checksums
