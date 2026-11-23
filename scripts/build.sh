@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="1.2"
+VERSION="1.3"
 JAR_NAME="clchunkfix-${VERSION}.jar"
 FORGE_JAR="${FORGE_JAR:-}"
 ASM_JAR="${ASM_JAR:-$ROOT/build/asm-all-4.1.jar}"
@@ -54,7 +54,9 @@ java -jar "$ECJ_JAR" \
     "$ROOT/src/clchunkfix/ChunkFix.java" \
     "$ROOT/src/clchunkfix/core/ChunkFixCorePlugin.java" \
     "$ROOT/src/clchunkfix/core/WorldExtensionTransformer.java" \
-    "$ROOT/src/clchunkfix/core/WorldExtensionHooks.java"
+    "$ROOT/src/clchunkfix/core/WorldExtensionHooks.java" \
+    "$ROOT/src/clchunkfix/core/InvTweaksTransformer.java" \
+    "$ROOT/src/clchunkfix/core/InvTweaksHooks.java"
 
 mkdir -p "$ROOT/build/jar/META-INF"
 printf 'Manifest-Version: 1.0\r\nFMLCorePlugin: clchunkfix.core.ChunkFixCorePlugin\r\nFMLCorePluginContainsFMLMod: true\r\n' \
@@ -67,14 +69,16 @@ cp -r "$ROOT/build/classes/." "$ROOT/build/jar/"
     zip -q -r "$ROOT/build/$JAR_NAME" .
 )
 
-rm -f "$ROOT/mods/clchunkfix-1.0.jar" "$ROOT/mods/clchunkfix-1.1.jar"
+rm -f "$ROOT/mods/clchunkfix-1.0.jar" "$ROOT/mods/clchunkfix-1.1.jar" "$ROOT/mods/clchunkfix-1.2.jar"
 cp "$ROOT/build/$JAR_NAME" "$ROOT/mods/$JAR_NAME"
 
 for class_file in \
     "$ROOT/build/classes/clchunkfix/ChunkFix.class" \
     "$ROOT/build/classes/clchunkfix/core/WorldExtensionTransformer.class" \
     "$ROOT/build/classes/clchunkfix/core/WorldExtensionHooks.class" \
-    "$ROOT/build/classes/clchunkfix/core/ChunkFixCorePlugin.class"; do
+    "$ROOT/build/classes/clchunkfix/core/ChunkFixCorePlugin.class" \
+    "$ROOT/build/classes/clchunkfix/core/InvTweaksTransformer.class" \
+    "$ROOT/build/classes/clchunkfix/core/InvTweaksHooks.class"; do
     MAJOR="$(od -An -t u1 -j 6 -N 2 "$class_file" | awk '{print $2}')"
     if [ "$MAJOR" != "51" ]; then
         echo "Unexpected class major version in $class_file: $MAJOR (expected 51/Java 7)" >&2

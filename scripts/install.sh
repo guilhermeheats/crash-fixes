@@ -72,8 +72,8 @@ command -v "$PYTHON" >/dev/null 2>&1 || {
 MODS="$GAME_DIR/mods"
 echo "Installing fixes into: $GAME_DIR"
 cp "$ROOT/mods/legacyjavafixer-1.0.jar" "$MODS/legacyjavafixer-1.0.jar"
-cp "$ROOT/mods/clchunkfix-1.2.jar" "$MODS/clchunkfix-1.2.jar"
-rm -f "$MODS/clchunkfix-1.0.jar" "$MODS/clchunkfix-1.1.jar"
+cp "$ROOT/mods/clchunkfix-1.3.jar" "$MODS/clchunkfix-1.3.jar"
+rm -f "$MODS/clchunkfix-1.0.jar" "$MODS/clchunkfix-1.1.jar" "$MODS/clchunkfix-1.2.jar"
 
 if [ "$APPLY_OPTIONS" = "1" ]; then
     if [ -f "$GAME_DIR/options.txt" ]; then
@@ -99,7 +99,7 @@ cat <<'EOF'
 
 Done. Required mods:
   mods/legacyjavafixer-1.0.jar
-  mods/clchunkfix-1.2.jar
+  mods/clchunkfix-1.3.jar
 
 Use Java 8 64-bit and set these JVM arguments in your launcher:
   -Xms4096m -Xmx4096m

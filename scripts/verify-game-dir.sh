@@ -57,7 +57,7 @@ else
     warn "config/ missing; is Crash Landing installed?"
 fi
 
-for jar in legacyjavafixer-1.0.jar clchunkfix-1.2.jar; do
+for jar in legacyjavafixer-1.0.jar clchunkfix-1.3.jar; do
     if [ -f "$MODS/$jar" ]; then
         ok "required mod: $jar"
     else

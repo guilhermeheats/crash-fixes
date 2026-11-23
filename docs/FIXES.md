@@ -40,7 +40,7 @@ Caused by: java.io.IOException: No such file or directory
 
 Cause: Crash Landing deletes the hardcore world on death. ChickenChunks stores the save directory in a static field. When a new world is created in the same game session, the old directory is used and the file creation fails.
 
-Fix: `clchunkfix-1.2.jar` listens for `FMLServerStoppedEvent` and calls the public `ChunkLoaderManager.serverShutdown()`. The next world load recalculates its `saveDir`.
+Fix: `clchunkfix-1.3.jar` listens for `FMLServerStoppedEvent` and calls the public `ChunkLoaderManager.serverShutdown()`. The next world load recalculates its `saveDir`.
 
 ## 3. Ruins `RuinsPositionsFile.txt`
 
@@ -52,7 +52,7 @@ java.io.FileNotFoundException: .../saves/Crash Landing 3/RuinsPositionsFile.txt 
 
 Cause: Ruins 11.0 caches `WorldHandle`/`RuinGenerator` instances per dimension in `generatorMap`. After a world switch, the new world reuses the old generator and points to the deleted world's positions file.
 
-Fix: `clchunkfix-1.2.jar` clears the private `generatorMap` of `atomicstryker.ruins.common.RuinsMod` on `FMLServerStopped`. The next world creates fresh handlers.
+Fix: `clchunkfix-1.3.jar` clears the private `generatorMap` of `atomicstryker.ruins.common.RuinsMod` on `FMLServerStopped`. The next world creates fresh handlers.
 
 Expected log after stopping a world:
 
@@ -76,7 +76,7 @@ In game this looks like a frozen world: mobs stop moving and chests no longer op
 
 Cause: CodeChickenLib 1.0.0.62 iterates `worldMap.get(world)` without a null check. The map is populated by `WorldEvent.Load`; if a world tick arrives without that entry (or after it was removed), the loop throws.
 
-Fix: `clchunkfix-1.2.jar` contains a small coremod. It injects a guard at the start of `preTick`/`postTick`; the guard creates the missing `WorldExtension[]` through CodeChickenLib's own `onWorldLoad`, or installs an empty array if that fails. The server keeps ticking instead of crashing. The guard logs one of:
+Fix: `clchunkfix-1.3.jar` contains a small coremod. It injects a guard at the start of `preTick`/`postTick`; the guard creates the missing `WorldExtension[]` through CodeChickenLib's own `onWorldLoad`, or installs an empty array if that fails. The server keeps ticking instead of crashing. The guard logs one of:
 
 ```text
 [CLWorldFix] Created missing CodeChickenLib world extensions on demand.
@@ -85,7 +85,28 @@ Fix: `clchunkfix-1.2.jar` contains a small coremod. It injects a guard at the st
 
 The guard is defensive; it does not change chunk-loader behavior, recipes, mobs, loot or world data.
 
-## 5. CustomChestLoot configs
+## 5. Inventory Tweaks stale container click
+
+Symptom:
+
+```text
+Description: Ticking memory connection
+java.lang.IndexOutOfBoundsException: Index: 55, Size: 45
+    at net.minecraft.inventory.Container.func_75144_a(SourceFile:207)
+    at invtweaks.forge.PacketHandler.onClickPacket(PacketHandler.java:46)
+```
+
+In game this appears as a lagging/desynchronised chest: blocks and items roll back, item pickup is delayed, and the chest GUI stops responding. The integrated server has already returned to the player inventory (45 slots), but the client still has a chest GUI open and Inventory Tweaks sends a click for a chest/player slot that no longer exists.
+
+Fix: `clchunkfix-1.3.jar` adds a coremod guard at the start of `PacketHandler.onClickPacket`. It reads the requested slot from the packet, compares it with the server container size, and drops the click if it is out of range. It also closes the stale GUI so the next interaction reopens the chest cleanly.
+
+Expected log when an invalid click is blocked:
+
+```text
+[CLWorldFix] Blocked Inventory Tweaks click for slot 55 (server container has 45 slots); closing the stale GUI.
+```
+
+## 6. CustomChestLoot configs
 
 Symptom:
 
@@ -97,7 +118,7 @@ Cause: `contents=` lists are wrapped over multiple lines without a backslash. Ja
 
 Fix: `scripts/fix-customchestloot.py` / `fix-customchestloot.ps1` join only the continuation lines. IDs, metadata, weights and quantities are unchanged.
 
-## 6. Obsolete update checks / radio
+## 7. Obsolete update checks / radio
 
 Crash Landing is a 2015 pack. Several mods try to contact dead update/radio endpoints, causing timeouts and log noise.
 

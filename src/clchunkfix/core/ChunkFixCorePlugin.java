@@ -25,7 +25,10 @@ public class ChunkFixCorePlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[]{"clchunkfix.core.WorldExtensionTransformer"};
+        return new String[]{
+                "clchunkfix.core.WorldExtensionTransformer",
+                "clchunkfix.core.InvTweaksTransformer"
+        };
     }
 
     @Override

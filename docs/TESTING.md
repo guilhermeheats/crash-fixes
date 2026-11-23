@@ -46,6 +46,34 @@ Validation performed:
 The exact chest-breaking sequence in the affected save was not replayed
 automatically; the unit test exercises the same `preTick` null path.
 
+
+## Inventory Tweaks guard validation (v1.3)
+
+The real instance produced this crash on 2026-11-23:
+
+```text
+Description: Ticking memory connection
+java.lang.IndexOutOfBoundsException: Index: 55, Size: 45
+    at net.minecraft.inventory.Container.func_75144_a(SourceFile:207)
+    at invtweaks.forge.PacketHandler.onClickPacket(PacketHandler.java:46)
+```
+
+The server container was the player inventory (45 slots), while the client
+still had a chest GUI open and Inventory Tweaks sent a click for slot 55.
+
+Validation performed:
+
+- Synthetic Java 8 test with a 45-slot container:
+  - slot 44: allowed (`true`);
+  - slot 55: blocked (`false`), and the fake player's `closeScreen` was called.
+- The transformer was applied to the actual `invtweaks.forge.PacketHandler`
+  class; the patched `onClickPacket` starts with the `allowClick` guard.
+- The real instance launched with `clchunkfix-1.3.jar`: the log shows
+  `[CLWorldFix] Patched Inventory Tweaks container click guard.`,
+  `[CLWorldFix] Patched CodeChickenLib WorldExtensionManager tick guard.`,
+  102 mods loaded and no new crash report.
+- The guard is defensive: it does not sort, move or delete items.
+
 ## Matrix
 
 | Test | Linux | Windows 10 LTSC VM | macOS |

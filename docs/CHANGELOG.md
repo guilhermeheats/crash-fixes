@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.2.0 — Inventory Tweaks stale GUI guard
+
+- `clchunkfix-1.3.jar` adds a coremod guard for Inventory Tweaks 1.56.
+- Fixes the `Container.clickSlot` `IndexOutOfBoundsException` (for example
+  `Index: 55, Size: 45`) that stops the integrated server when a stale chest
+  GUI sends a click for a slot that no longer exists.
+- The guard drops the invalid click and closes the stale GUI so the next chest
+  interaction reopens cleanly.
+- Installers remove older `clchunkfix-1.0.jar`, `1.1.jar` and `1.2.jar`.
+- Verified with a synthetic invalid click (slot 55 of a 45-slot container):
+  valid clicks pass, invalid clicks are blocked and the fake GUI closes.
+- The real instance launched with 1.3: both guards logged, 102 mods loaded,
+  no new crash report.
+- No pack, mod, recipe, loot or world data is redistributed or changed.
+
 ## v2.1.0 — CodeChickenLib world tick guard
 
 - `clchunkfix-1.2.jar` adds a coremod guard for CodeChickenLib 1.0.0.62.

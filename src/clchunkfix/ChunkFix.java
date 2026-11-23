@@ -24,8 +24,11 @@ import java.util.Map;
  *  - CodeChickenLib 1.0.0.62: a world ticked without a worldMap entry
  *    -> NullPointerException in WorldExtensionManager.preTick, which stops
  *    the integrated server tick loop (frozen mobs, chests not opening)
+ *  - Inventory Tweaks 1.56: a stale chest GUI sends a click for a slot that
+ *    no longer exists on the server -> IndexOutOfBoundsException in
+ *    Container.clickSlot, which also stops the integrated server
  */
-@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.2")
+@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.3")
 public class ChunkFix {
 
     @Mod.EventHandler

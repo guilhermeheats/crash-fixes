@@ -15,10 +15,10 @@
 - Official source: https://www.curseforge.com/minecraft/modpacks/crash-landing
 - The project only references the pack for compatibility; no pack archive, mods or world are redistributed.
 
-## ChickenChunks, Ruins and CodeChickenLib
+## ChickenChunks, Ruins, CodeChickenLib and Inventory Tweaks
 
 - Not included. They are part of the Crash Landing pack.
-- `clchunkfix` uses the public `ChunkLoaderManager.serverShutdown()` method, reflection on Ruins' private `generatorMap`, and a small ASM transformer that guards `CodeChickenLib`'s `WorldExtensionManager` world map at runtime.
+- `clchunkfix` uses the public `ChunkLoaderManager.serverShutdown()` method, reflection on Ruins' private `generatorMap`, and small ASM transformers that guard `CodeChickenLib`'s `WorldExtensionManager` world map and `Inventory Tweaks`' stale container clicks at runtime.
 - The coremod references the ASM 4.1 API supplied by Forge/FML; it does not bundle or redistribute ASM.
 
 ## Full credits
