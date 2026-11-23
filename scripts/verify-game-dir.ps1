@@ -23,7 +23,7 @@ Ok "mods/ present"
 if (Test-Path -LiteralPath $Config) { Ok "config/ present" }
 else { Warn "config/ missing; is Crash Landing installed?" }
 
-foreach ($jar in @("legacyjavafixer-1.0.jar", "clchunkfix-1.3.jar")) {
+foreach ($jar in @("legacyjavafixer-1.0.jar", "clchunkfix-1.4.jar")) {
     if (Test-Path -LiteralPath (Join-Path $Mods $jar)) {
         Ok "required mod: $jar"
     }

@@ -15,10 +15,11 @@ if (-not (Test-Path -LiteralPath (Join-Path $GameDir "mods"))) {
 $Mods = Join-Path $GameDir "mods"
 Write-Host "Installing fixes into: $GameDir"
 Copy-Item -LiteralPath (Join-Path $Root "mods\legacyjavafixer-1.0.jar") -Destination (Join-Path $Mods "legacyjavafixer-1.0.jar") -Force
-Copy-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.3.jar") -Destination (Join-Path $Mods "clchunkfix-1.3.jar") -Force
+Copy-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.4.jar") -Destination (Join-Path $Mods "clchunkfix-1.4.jar") -Force
 Remove-Item -LiteralPath (Join-Path $Mods "clchunkfix-1.0.jar") -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath (Join-Path $Mods "clchunkfix-1.1.jar") -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath (Join-Path $Mods "clchunkfix-1.2.jar") -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath (Join-Path $Mods "clchunkfix-1.3.jar") -Force -ErrorAction SilentlyContinue
 
 if (-not $NoOptions) {
     $options = Join-Path $GameDir "options.txt"
@@ -47,7 +48,7 @@ else {
 Write-Host ""
 Write-Host "Done. Required mods:"
 Write-Host "  mods\legacyjavafixer-1.0.jar"
-Write-Host "  mods\clchunkfix-1.3.jar"
+Write-Host "  mods\clchunkfix-1.4.jar"
 Write-Host ""
 Write-Host "Use Java 8 64-bit and set these JVM arguments in your launcher:"
 @'

@@ -68,11 +68,36 @@ Validation performed:
   - slot 55: blocked (`false`), and the fake player's `closeScreen` was called.
 - The transformer was applied to the actual `invtweaks.forge.PacketHandler`
   class; the patched `onClickPacket` starts with the `allowClick` guard.
-- The real instance launched with `clchunkfix-1.3.jar`: the log shows
+- The real instance launched with `clchunkfix-1.4.jar`: the log shows
   `[CLWorldFix] Patched Inventory Tweaks container click guard.`,
   `[CLWorldFix] Patched CodeChickenLib WorldExtensionManager tick guard.`,
   102 mods loaded and no new crash report.
 - The guard is defensive: it does not sort, move or delete items.
+
+
+## HQM OreDictionary cache validation (v1.4)
+
+A thread dump taken while the world was frozen showed the integrated server
+thread in HQM item pickup detection:
+
+```text
+"Server thread" ... RUNNABLE
+    at net.minecraftforge.oredict.OreDictionary.getOreID
+    at hardcorequesting.quests.ItemPrecision$4.same
+    at hardcorequesting.quests.QuestTaskItemsDetect.countItems
+    at hardcorequesting.quests.QuestTaskItemsDetect.onPickUp
+```
+
+With `clchunkfix-1.4.jar`:
+
+- the log shows `[CLWorldFix] Patched HQM OreDictionary lookup cache.`;
+- a second thread dump no longer contains any HQM/OreDictionary frame;
+- the server thread was in normal SpecialMobs pathfinding;
+- the world loaded and ran with no new crash report;
+- GC pauses stayed around 0.03–0.14 s in the diagnostic session.
+
+The cache is per `ItemStack`; it does not change quest definitions, progress or
+item matching semantics.
 
 ## Matrix
 

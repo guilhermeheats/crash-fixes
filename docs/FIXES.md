@@ -40,7 +40,7 @@ Caused by: java.io.IOException: No such file or directory
 
 Cause: Crash Landing deletes the hardcore world on death. ChickenChunks stores the save directory in a static field. When a new world is created in the same game session, the old directory is used and the file creation fails.
 
-Fix: `clchunkfix-1.3.jar` listens for `FMLServerStoppedEvent` and calls the public `ChunkLoaderManager.serverShutdown()`. The next world load recalculates its `saveDir`.
+Fix: `clchunkfix-1.4.jar` listens for `FMLServerStoppedEvent` and calls the public `ChunkLoaderManager.serverShutdown()`. The next world load recalculates its `saveDir`.
 
 ## 3. Ruins `RuinsPositionsFile.txt`
 
@@ -52,7 +52,7 @@ java.io.FileNotFoundException: .../saves/Crash Landing 3/RuinsPositionsFile.txt 
 
 Cause: Ruins 11.0 caches `WorldHandle`/`RuinGenerator` instances per dimension in `generatorMap`. After a world switch, the new world reuses the old generator and points to the deleted world's positions file.
 
-Fix: `clchunkfix-1.3.jar` clears the private `generatorMap` of `atomicstryker.ruins.common.RuinsMod` on `FMLServerStopped`. The next world creates fresh handlers.
+Fix: `clchunkfix-1.4.jar` clears the private `generatorMap` of `atomicstryker.ruins.common.RuinsMod` on `FMLServerStopped`. The next world creates fresh handlers.
 
 Expected log after stopping a world:
 
@@ -76,7 +76,7 @@ In game this looks like a frozen world: mobs stop moving and chests no longer op
 
 Cause: CodeChickenLib 1.0.0.62 iterates `worldMap.get(world)` without a null check. The map is populated by `WorldEvent.Load`; if a world tick arrives without that entry (or after it was removed), the loop throws.
 
-Fix: `clchunkfix-1.3.jar` contains a small coremod. It injects a guard at the start of `preTick`/`postTick`; the guard creates the missing `WorldExtension[]` through CodeChickenLib's own `onWorldLoad`, or installs an empty array if that fails. The server keeps ticking instead of crashing. The guard logs one of:
+Fix: `clchunkfix-1.4.jar` contains a small coremod. It injects a guard at the start of `preTick`/`postTick`; the guard creates the missing `WorldExtension[]` through CodeChickenLib's own `onWorldLoad`, or installs an empty array if that fails. The server keeps ticking instead of crashing. The guard logs one of:
 
 ```text
 [CLWorldFix] Created missing CodeChickenLib world extensions on demand.
@@ -98,7 +98,7 @@ java.lang.IndexOutOfBoundsException: Index: 55, Size: 45
 
 In game this appears as a lagging/desynchronised chest: blocks and items roll back, item pickup is delayed, and the chest GUI stops responding. The integrated server has already returned to the player inventory (45 slots), but the client still has a chest GUI open and Inventory Tweaks sends a click for a chest/player slot that no longer exists.
 
-Fix: `clchunkfix-1.3.jar` adds a coremod guard at the start of `PacketHandler.onClickPacket`. It reads the requested slot from the packet, compares it with the server container size, and drops the click if it is out of range. It also closes the stale GUI so the next interaction reopens the chest cleanly.
+Fix: `clchunkfix-1.4.jar` adds a coremod guard at the start of `PacketHandler.onClickPacket`. It reads the requested slot from the packet, compares it with the server container size, and drops the click if it is out of range. It also closes the stale GUI so the next interaction reopens the chest cleanly.
 
 Expected log when an invalid click is blocked:
 
@@ -106,7 +106,33 @@ Expected log when an invalid click is blocked:
 [CLWorldFix] Blocked Inventory Tweaks click for slot 55 (server container has 45 slots); closing the stale GUI.
 ```
 
-## 6. CustomChestLoot configs
+## 6. HQM OreDictionary pickup lag
+
+Symptom:
+
+```text
+"Server thread" ... RUNNABLE
+    at net.minecraftforge.oredict.OreDictionary.getOreID
+    at hardcorequesting.quests.ItemPrecision$4.same
+    at hardcorequesting.quests.QuestTaskItemsDetect.countItems
+    at hardcorequesting.quests.QuestTaskItemsDetect.onPickUp
+```
+
+In game: the world freezes when many items are on the ground, especially after
+breaking full chests. Mobs stop moving, chest GUIs open late, item pickup is
+delayed and eating never completes.
+
+Cause: HQM 4.0.5 checks every picked-up item against every quest item. For
+OreDictionary precision it calls `OreDictionary.getOreID` for each comparison;
+that method scans the entire ore dictionary. A large inventory plus many quest
+items makes the server thread spend seconds in this loop.
+
+Fix: `clchunkfix-1.4.jar` replaces HQM's direct `getOreID` calls with a
+per-`ItemStack` weak cache. The first lookup is unchanged; repeated comparisons
+of the same stack are constant-time. Quest definitions, progress and matching
+semantics are unchanged.
+
+## 7. CustomChestLoot configs
 
 Symptom:
 
@@ -118,7 +144,7 @@ Cause: `contents=` lists are wrapped over multiple lines without a backslash. Ja
 
 Fix: `scripts/fix-customchestloot.py` / `fix-customchestloot.ps1` join only the continuation lines. IDs, metadata, weights and quantities are unchanged.
 
-## 7. Obsolete update checks / radio
+## 8. Obsolete update checks / radio
 
 Crash Landing is a 2015 pack. Several mods try to contact dead update/radio endpoints, causing timeouts and log noise.
 

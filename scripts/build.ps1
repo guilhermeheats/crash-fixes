@@ -11,7 +11,7 @@ $Root = Split-Path -Parent $PSScriptRoot
 $Build = Join-Path $Root "build"
 $Classes = Join-Path $Build "classes"
 $Stage = Join-Path $Build "jar"
-$Jar = Join-Path $Build "clchunkfix-1.3.jar"
+$Jar = Join-Path $Build "clchunkfix-1.4.jar"
 
 $forgeUrl = "https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.965/forge-1.6.4-9.11.1.965-universal.jar"
 $ecjUrl = "https://repo1.maven.org/maven2/org/eclipse/jdt/ecj/3.33.0/ecj-3.33.0.jar"
@@ -60,7 +60,9 @@ $Sources = @(
     (Join-Path $Root "src\clchunkfix\core\WorldExtensionTransformer.java"),
     (Join-Path $Root "src\clchunkfix\core\WorldExtensionHooks.java"),
     (Join-Path $Root "src\clchunkfix\core\InvTweaksTransformer.java"),
-    (Join-Path $Root "src\clchunkfix\core\InvTweaksHooks.java")
+    (Join-Path $Root "src\clchunkfix\core\InvTweaksHooks.java"),
+    (Join-Path $Root "src\clchunkfix\core\HqmTransformer.java"),
+    (Join-Path $Root "src\clchunkfix\core\HqmHooks.java")
 )
 
 Write-Host "Compiling (Java 7 bytecode for FML 1.6.4/ASM 4.1)..."
@@ -92,7 +94,9 @@ $classFiles = @(
     (Join-Path $Classes "clchunkfix\core\WorldExtensionHooks.class"),
     (Join-Path $Classes "clchunkfix\core\ChunkFixCorePlugin.class"),
     (Join-Path $Classes "clchunkfix\core\InvTweaksTransformer.class"),
-    (Join-Path $Classes "clchunkfix\core\InvTweaksHooks.class")
+    (Join-Path $Classes "clchunkfix\core\InvTweaksHooks.class"),
+    (Join-Path $Classes "clchunkfix\core\HqmTransformer.class"),
+    (Join-Path $Classes "clchunkfix\core\HqmHooks.class")
 )
 foreach ($classFile in $classFiles) {
     $bytes = [System.IO.File]::ReadAllBytes($classFile)
@@ -103,7 +107,8 @@ foreach ($classFile in $classFiles) {
 Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.0.jar") -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.1.jar") -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.2.jar") -Force -ErrorAction SilentlyContinue
-Copy-Item -LiteralPath $Jar -Destination (Join-Path $Root "mods\clchunkfix-1.3.jar") -Force
-Write-Host "Built: $(Join-Path $Root 'mods\clchunkfix-1.3.jar')"
+Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.3.jar") -Force -ErrorAction SilentlyContinue
+Copy-Item -LiteralPath $Jar -Destination (Join-Path $Root "mods\clchunkfix-1.4.jar") -Force
+Write-Host "Built: $(Join-Path $Root 'mods\clchunkfix-1.4.jar')"
 Write-Host "Class major version: 51"
-Get-FileHash -LiteralPath (Join-Path $Root "mods\clchunkfix-1.3.jar") -Algorithm SHA256
+Get-FileHash -LiteralPath (Join-Path $Root "mods\clchunkfix-1.4.jar") -Algorithm SHA256

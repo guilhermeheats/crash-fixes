@@ -27,8 +27,11 @@ import java.util.Map;
  *  - Inventory Tweaks 1.56: a stale chest GUI sends a click for a slot that
  *    no longer exists on the server -> IndexOutOfBoundsException in
  *    Container.clickSlot, which also stops the integrated server
+ *  - Hardcore Questing Mode 4.0.5: every item pickup compares against every
+ *    quest item and calls OreDictionary.getOreID, which scans the whole ore
+ *    dictionary and can stall the integrated server for seconds
  */
-@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.3")
+@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.4")
 public class ChunkFix {
 
     @Mod.EventHandler

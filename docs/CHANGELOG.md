@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.3.0 — HQM OreDictionary cache
+
+- `clchunkfix-1.4.jar` caches Hardcore Questing Mode 4.0.5 OreDictionary
+  lookups during item pickup detection.
+- Fixes the server thread spending seconds inside
+  `QuestTaskItemsDetect.onPickUp` → `ItemPrecision$4.same` →
+  `OreDictionary.getOreID`, which scans the whole ore dictionary for every
+  inventory/quest item comparison.
+- This was observed with a thread dump while the world was frozen: mobs stopped,
+  chests delayed and eating did not advance.
+- The cache is per `ItemStack`; quest definitions, progress and item matching
+  semantics are unchanged.
+- Installers remove older `clchunkfix-1.0` through `1.3`.
+- Verified with a thread dump before/after on a copy of the real save.
+- No pack, mod, recipe, loot or world data is redistributed or changed.
+
 ## v2.2.0 — Inventory Tweaks stale GUI guard
 
 - `clchunkfix-1.3.jar` adds a coremod guard for Inventory Tweaks 1.56.
