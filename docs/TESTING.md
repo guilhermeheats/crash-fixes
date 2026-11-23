@@ -95,6 +95,8 @@ With `clchunkfix-1.4.jar`:
 - the server thread was in normal SpecialMobs pathfinding;
 - the world loaded and ran with no new crash report;
 - GC pauses stayed around 0.03–0.14 s in the diagnostic session.
+- Live gameplay confirmation after 1.4: chest opens normally, items are picked
+  up quickly, mobs move, and block breaking works.
 
 The cache is per `ItemStack`; it does not change quest definitions, progress or
 item matching semantics.

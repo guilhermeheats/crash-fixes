@@ -14,6 +14,8 @@
   semantics are unchanged.
 - Installers remove older `clchunkfix-1.0` through `1.3`.
 - Verified with a thread dump before/after on a copy of the real save.
+- Confirmed in live gameplay: chest opening, item pickup, mob movement and
+  block breaking are normal.
 - No pack, mod, recipe, loot or world data is redistributed or changed.
 
 ## v2.2.0 — Inventory Tweaks stale GUI guard
