@@ -222,6 +222,23 @@ To close that last gap, either:
 9. Run `verify-game-dir.sh`/`.ps1`.
 10. Check `crash-reports/` for new files.
 
+## Dropped-item render distance validation (v1.5)
+
+- Minecraft 1.6.4 bytecode inspection:
+  - `Entity.isInRangeToRenderDist` uses
+    `boundingBox.getAverageEdgeLength() * 64 * renderDistanceWeight`;
+  - `EntityItem`'s hitbox is 0.25 blocks, so the vanilla client cutoff is
+    16 blocks;
+  - `EntityTracker` sends `EntityItem` up to 64 blocks.
+- Test copy: the transformer log shows
+  `[CLWorldFix] Patched dropped-item render distance to 64.0 blocks (+1.0 camera margin, a).`
+- Visual check: a dropped block on the flat roof was visible from 60 blocks
+  above in the test copy; under the vanilla 16-block formula it would be
+  culled.
+- GC log: the longest stop-the-world pause during the test was 0.066 s; no
+  `Can't keep up!` warning appeared in the test session.
+- Real instance: `clchunkfix-1.5.jar` installed; `verify-game-dir` PASS.
+
 ## CI workflows
 
 - `.github/workflows/verify.yml`: matrix Ubuntu/Windows/macOS; checksums, script parsing, build, class version, generic-game-dir installer smoke tests.

@@ -33,6 +33,29 @@ Java 8u202 64-bit
 
 Crash Landing is mostly CPU/mod-bound. The 2015 rendering and entity logic dominate; the GPU is rarely the limiting factor at normal render distances.
 
+## Dropped-item render distance (1.5)
+
+Vanilla 1.6.4 culls `EntityItem` at 16 blocks because its hitbox is 0.25 blocks
+(`0.25 × 64`). The server already tracks items up to 64 blocks.
+`clchunkfix-1.5.jar` raises the client cutoff to 64 blocks plus a 1-block camera
+margin.
+
+- This can render more item entities when many items are on the ground. The
+  default is the same 64-block limit the server already uses.
+- If FPS drops with large item piles, set
+  `-Dclchunkfix.itemRenderDistance=48` (range 16–64). The actual client cutoff
+  is the value plus 1 block.
+- The change is visual only; pickup range, physics, despawn and server tracking
+  are unchanged.
+
+## `Can't keep up!` warnings
+
+`Can't keep up!` was observed on 2026-11-24 at 20:27–20:28 in the real session.
+A GC log from the test copy showed a maximum stop-the-world pause of 0.066 s,
+so the warnings were not GC pauses. They were transient server-tick spikes;
+the pattern is consistent with chunk generation or mob pathfinding. They
+stopped on their own and no crash report was created.
+
 ## OptiFine 1.6.4
 
 **Not recommended and not included.**

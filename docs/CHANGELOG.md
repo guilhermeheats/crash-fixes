@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.4.0 — Dropped-item render distance
+
+- `clchunkfix-1.5.jar` raises the client-side render distance of dropped item
+  entities from 16 to 64 blocks, plus a 1-block camera margin.
+- Cause: `EntityItem`'s 0.25-block hitbox makes vanilla
+  `Entity.isInRangeToRenderDist` cull it at 16 blocks, while the server
+  `EntityTracker` already tracks item entities up to 64 blocks.
+- Visual-only: pickup range, physics, despawn and server tracking are
+  unchanged.
+- Optional JVM property `-Dclchunkfix.itemRenderDistance=<16-64>`; default 64.
+- Verified in a copy of the world: a dropped block was visible from 60 blocks
+  above; the transformer log shows the 64-block override; no crash report.
+- GC logging during the test showed a maximum stop-the-world pause of 0.066 s,
+  so the observed `Can't keep up!` warnings were not GC pauses; they were
+  transient server-tick spikes.
+- Installers remove older `clchunkfix-1.0` through `1.4`.
+- No pack, mod, recipe, loot or world data is redistributed or changed.
+
 ## v2.3.0 — HQM OreDictionary cache
 
 - `clchunkfix-1.4.jar` caches Hardcore Questing Mode 4.0.5 OreDictionary

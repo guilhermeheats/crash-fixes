@@ -30,8 +30,10 @@ import java.util.Map;
  *  - Hardcore Questing Mode 4.0.5: every item pickup compares against every
  *    quest item and calls OreDictionary.getOreID, which scans the whole ore
  *    dictionary and can stall the integrated server for seconds
+ *  - EntityItem: the client culls dropped items at 16 blocks even though the
+ *    server tracks them up to 64, so mob drops disappear at short range
  */
-@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.4")
+@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.5")
 public class ChunkFix {
 
     @Mod.EventHandler

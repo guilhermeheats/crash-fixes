@@ -5,13 +5,15 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import java.util.Map;
 
 /**
- * Coremod entry point for the CodeChickenLib world-extension guard.
+ * Coremod entry point for the Crash Landing compatibility guards.
  *
  * The regular clchunkfix mod handles stale ChickenChunks/Ruins state on a
- * world switch. This coremod handles a separate failure: CodeChickenLib can
- * tick a World that was never registered in its static worldMap, producing a
- * NullPointerException in WorldExtensionManager.preTick and stopping the
- * integrated server tick loop.
+ * world switch. The coremod transformers handle separate failures:
+ * CodeChickenLib can tick a World that was never registered in its static
+ * worldMap (NullPointerException in preTick), Inventory Tweaks can send a
+ * stale container click, HQM scans the OreDictionary on every pickup, and
+ * EntityItem is culled by the client at 16 blocks even though the server
+ * tracks it up to 64.
  */
 @IFMLLoadingPlugin.Name("CLChunkFixCore")
 @IFMLLoadingPlugin.MCVersion("1.6.4")
@@ -28,7 +30,8 @@ public class ChunkFixCorePlugin implements IFMLLoadingPlugin {
         return new String[]{
                 "clchunkfix.core.WorldExtensionTransformer",
                 "clchunkfix.core.InvTweaksTransformer",
-                "clchunkfix.core.HqmTransformer"
+                "clchunkfix.core.HqmTransformer",
+                "clchunkfix.core.ItemRenderTransformer"
         };
     }
 

@@ -22,20 +22,22 @@ This repository contains only fixes, scripts, documentation and checksums. It do
 1. **Startup crash** — `ConcurrentModificationException` in LaunchWrapper with Forge 1.6.4 + Java 8u20+.
    Fix: `legacyjavafixer-1.0.jar` (MinecraftForge, MIT).
 2. **Death → new world crash** — ChickenChunks keeps the deleted world's save directory and throws `IOException` in `updateLoginTimes`.
-   Fix: `clchunkfix-1.4.jar` resets ChickenChunks on server stop.
+   Fix: `clchunkfix-1.5.jar` resets ChickenChunks on server stop.
 3. **Ruins writing to the old world** — stale `generatorMap` after a world switch.
-   Fix: `clchunkfix-1.4.jar` clears the Ruins map on server stop.
+   Fix: `clchunkfix-1.5.jar` clears the Ruins map on server stop.
 4. **Frozen world after breaking a chest** — CodeChickenLib ticks a world that is missing from its static `worldMap`, throwing `NullPointerException` in `WorldExtensionManager.preTick`. The integrated server stops ticking, so mobs freeze and chests stop opening.
-   Fix: `clchunkfix-1.4.jar` initializes the missing extension set (or installs a safe empty one) before the world tick.
+   Fix: `clchunkfix-1.5.jar` initializes the missing extension set (or installs a safe empty one) before the world tick.
 5. **Chest/item desync and rollback** — Inventory Tweaks sends a click for a slot that no longer exists on the server (stale chest GUI), causing `IndexOutOfBoundsException` in `Container.clickSlot` and stopping the integrated server.
-   Fix: `clchunkfix-1.4.jar` validates the click against the server container and closes the stale GUI instead of crashing.
+   Fix: `clchunkfix-1.5.jar` validates the click against the server container and closes the stale GUI instead of crashing.
 6. **World freeze with many items on the ground** — HQM compares every pickup against every quest item and calls `OreDictionary.getOreID`, which scans the whole ore dictionary and stalls the server.
-   Fix: `clchunkfix-1.4.jar` caches HQM's OreDictionary lookups per `ItemStack`.
-7. **CustomChestLoot ignoring entries** — broken multi-line `contents=` lists.
+   Fix: `clchunkfix-1.5.jar` caches HQM's OreDictionary lookups per `ItemStack`.
+7. **Dropped items invisible at distance** — the client culls `EntityItem` at 16 blocks because of its 0.25-block hitbox, even though the server tracks items up to 64 blocks.
+   Fix: `clchunkfix-1.5.jar` raises the client item render distance to 64 blocks (plus a 1-block camera margin).
+8. **CustomChestLoot ignoring entries** — broken multi-line `contents=` lists.
    Fix: `scripts/fix-customchestloot.py` / `.ps1`.
-8. **Obsolete network noise** — update checks/radio timeouts.
+9. **Obsolete network noise** — update checks/radio timeouts.
    Fix: `scripts/cleanup-network-checks.py` / `.ps1`.
-9. **Max-fidelity video profile** — `examples/options.txt`.
+10. **Max-fidelity video profile** — `examples/options.txt`.
 
 Details: [docs/FIXES.md](docs/FIXES.md).
 
@@ -100,7 +102,7 @@ Keep your current video options:
 
 ### Manual
 
-Copy `mods/legacyjavafixer-1.0.jar` and `mods/clchunkfix-1.4.jar` into your `mods/` folder. Then run the CustomChestLoot and network-cleanup scripts against the game directory, and optionally copy `examples/options.txt` to `options.txt`.
+Copy `mods/legacyjavafixer-1.0.jar` and `mods/clchunkfix-1.5.jar` into your `mods/` folder. Then run the CustomChestLoot and network-cleanup scripts against the game directory, and optionally copy `examples/options.txt` to `options.txt`.
 
 ## JVM arguments
 
@@ -120,6 +122,8 @@ The installer cannot edit every launcher's JVM settings, so set these in your la
 ```
 
 Use **Java 8 64-bit**. The exact menu varies by launcher: “Java/JVM arguments”, “Advanced options”, “Additional Java parameters”, or a profile's JVM arguments.
+
+Optional: add `-Dclchunkfix.itemRenderDistance=48` to lower the dropped-item render distance (default 64, range 16–64; the client cutoff is the value plus a 1-block camera margin).
 
 ## Verify
 
@@ -192,7 +196,7 @@ See [docs/LEGAL.md](docs/LEGAL.md) and [THIRD_PARTY.md](THIRD_PARTY.md).
 ## Repository layout
 
 ```
-mods/                  clchunkfix-1.4.jar, legacyjavafixer-1.0.jar
+mods/                  clchunkfix-1.5.jar, legacyjavafixer-1.0.jar
 src/                   clchunkfix source + mcmod.info
 examples/options.txt   max-fidelity video profile
 mods.sha256            hashes of the 63 mod files in a Crash Landing 1.1.3 instance
