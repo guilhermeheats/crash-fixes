@@ -11,7 +11,7 @@ $Root = Split-Path -Parent $PSScriptRoot
 $Build = Join-Path $Root "build"
 $Classes = Join-Path $Build "classes"
 $Stage = Join-Path $Build "jar"
-$Jar = Join-Path $Build "clchunkfix-1.5.jar"
+$Jar = Join-Path $Build "clchunkfix-1.6.jar"
 
 $forgeUrl = "https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.965/forge-1.6.4-9.11.1.965-universal.jar"
 $ecjUrl = "https://repo1.maven.org/maven2/org/eclipse/jdt/ecj/3.33.0/ecj-3.33.0.jar"
@@ -111,7 +111,8 @@ Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.1.jar") -Force -Err
 Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.2.jar") -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.3.jar") -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.4.jar") -Force -ErrorAction SilentlyContinue
-Copy-Item -LiteralPath $Jar -Destination (Join-Path $Root "mods\clchunkfix-1.5.jar") -Force
-Write-Host "Built: $(Join-Path $Root 'mods\clchunkfix-1.5.jar')"
+Remove-Item -LiteralPath (Join-Path $Root "mods\clchunkfix-1.5.jar") -Force -ErrorAction SilentlyContinue
+Copy-Item -LiteralPath $Jar -Destination (Join-Path $Root "mods\clchunkfix-1.6.jar") -Force
+Write-Host "Built: $(Join-Path $Root 'mods\clchunkfix-1.6.jar')"
 Write-Host "Class major version: 51"
-Get-FileHash -LiteralPath (Join-Path $Root "mods\clchunkfix-1.5.jar") -Algorithm SHA256
+Get-FileHash -LiteralPath (Join-Path $Root "mods\clchunkfix-1.6.jar") -Algorithm SHA256

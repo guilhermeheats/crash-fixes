@@ -1,11 +1,14 @@
 package clchunkfix;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -32,14 +35,90 @@ import java.util.Map;
  *    dictionary and can stall the integrated server for seconds
  *  - EntityItem: the client culls dropped items at 16 blocks even though the
  *    server tracks them up to 64, so mob drops disappear at short range
+ *  - Integrated server: the default server view distance is 10 chunks while
+ *    the client can render Far (16), leaving a band of unloaded chunks at the
+ *    edge; raise the server view distance to 16 on server start
  */
-@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.5")
+@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.6")
 public class ChunkFix {
+
+    @Mod.EventHandler
+    public void onServerStarted(FMLServerStartedEvent event) {
+        if (!FMLCommonHandler.instance().getSide().isClient()) {
+            return;
+        }
+        try {
+            Object fml = FMLCommonHandler.instance();
+            Object server = fml.getClass().getMethod("getMinecraftServerInstance").invoke(fml);
+            if (server == null) {
+                System.out.println("[CLWorldFix] No integrated server instance; skipping view distance.");
+                return;
+            }
+
+            Method getConfigurationManager = null;
+            for (Method method : server.getClass().getMethods()) {
+                if (method.getParameterTypes().length == 0
+                        && method.getReturnType().getName().endsWith("ServerConfigurationManager")) {
+                    getConfigurationManager = method;
+                    break;
+                }
+            }
+            if (getConfigurationManager == null) {
+                System.out.println("[CLWorldFix] Could not find server configuration manager.");
+                return;
+            }
+
+            Object manager = getConfigurationManager.invoke(server);
+            Field viewDistance = null;
+            for (Field field : manager.getClass().getDeclaredFields()) {
+                if (field.getType() == int.class
+                        && ("field_72402_d".equals(field.getName()) || "c".equals(field.getName()))) {
+                    viewDistance = field;
+                    break;
+                }
+            }
+            if (viewDistance == null) {
+                System.out.println("[CLWorldFix] Could not find server view distance field.");
+                return;
+            }
+
+            int chunks = configuredServerViewDistance();
+            viewDistance.setAccessible(true);
+            // ServerConfigurationManager stores viewDistance + 1; PlayerManager
+            // converts it back to (viewDistance) * 16 blocks.
+            viewDistance.setInt(manager, chunks + 1);
+            System.out.println("[CLWorldFix] Set integrated-server view distance to "
+                    + chunks + " chunks.");
+        } catch (Throwable t) {
+            System.out.println("[CLWorldFix] Could not set server view distance: " + t);
+        }
+    }
 
     @Mod.EventHandler
     public void onServerStopped(FMLServerStoppedEvent event) {
         resetChickenChunks();
         resetRuins();
+    }
+
+    private static int configuredServerViewDistance() {
+        int chunks = 16;
+        String raw = System.getProperty("clchunkfix.serverViewDistance");
+        if (raw != null) {
+            try {
+                chunks = Integer.parseInt(raw.trim());
+            } catch (NumberFormatException e) {
+                System.out.println("[CLWorldFix] Invalid serverViewDistance '" + raw
+                        + "'; using 16.");
+                chunks = 16;
+            }
+        }
+        if (chunks < 3) {
+            chunks = 3;
+        }
+        if (chunks > 16) {
+            chunks = 16;
+        }
+        return chunks;
     }
 
     private void resetChickenChunks() {

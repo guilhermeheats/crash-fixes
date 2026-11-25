@@ -24,7 +24,7 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            mods/clchunkfix-1.5.jar
+            mods/clchunkfix-1.6.jar
             mods/legacyjavafixer-1.0.jar
             checksums.txt
             mods.sha256

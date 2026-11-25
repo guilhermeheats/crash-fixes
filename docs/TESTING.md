@@ -239,6 +239,22 @@ To close that last gap, either:
   `Can't keep up!` warning appeared in the test session.
 - Real instance: `clchunkfix-1.5.jar` installed; `verify-game-dir` PASS.
 
+## Integrated-server Far view distance validation (v1.6)
+
+Validation steps on the real instance:
+
+1. Install `clchunkfix-1.6.jar` and restart the world so
+   `FMLServerStartedEvent` runs.
+2. Confirm the log line
+   `[CLWorldFix] Set integrated-server view distance to 16 chunks.`
+3. Press F3 and check the `C:` loaded-chunk count. It should cover the
+   16-chunk radius instead of the smaller default; the band at the old edge
+   should be gone.
+4. Keep the client FPS unlimited; the fix does not cap FPS.
+5. Use a 5–6 GB heap and close background applications. The real session was
+   using about 4.25 GB RSS with a 4 GB heap, which is tight for Far plus
+   16-chunk chunk loading.
+
 ## CI workflows
 
 - `.github/workflows/verify.yml`: matrix Ubuntu/Windows/macOS; checksums, script parsing, build, class version, generic-game-dir installer smoke tests.

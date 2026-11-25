@@ -48,13 +48,30 @@ margin.
 - The change is visual only; pickup range, physics, despawn and server tracking
   are unchanged.
 
+## Integrated-server Far view distance (1.6)
+
+The client can render Far (16 chunks), but the integrated server's default view
+distance is smaller (10 chunks). `clchunkfix-1.6.jar` raises it to 16 on server
+start.
+
+- No FPS limit; the client still renders at the selected framerate.
+- The trade-off is more chunk generation, loading and memory. The real session
+  was using about 4.25 GB RSS with a 4 GB heap; for Far + 16 chunks, use 5–6 GB
+  and close the browser/background apps.
+- Optional `-Dclchunkfix.serverViewDistance=8` lowers the server view distance;
+  with the client still on Far, a band at 8 chunks would remain.
+- Expected log:
+  `[CLWorldFix] Set integrated-server view distance to 16 chunks.`
+
 ## `Can't keep up!` warnings
 
 `Can't keep up!` was observed on 2026-11-24 at 20:27–20:28 in the real session.
-A GC log from the test copy showed a maximum stop-the-world pause of 0.066 s,
-so the warnings were not GC pauses. They were transient server-tick spikes;
-the pattern is consistent with chunk generation or mob pathfinding. They
-stopped on their own and no crash report was created.
+A GC log from the test copy showed a maximum stop-the-world pause of 0.066 s at
+startup, so the warnings were not a single long GC pause. They were transient
+server-tick spikes; the pattern is consistent with chunk generation or mob
+pathfinding. The real session was also at about 4.25 GB RSS with a 4 GB heap,
+so GC pressure under load is likely to contribute. Use 5–6 GB for Far/16
+chunks and close background applications. No crash report was created.
 
 ## OptiFine 1.6.4
 

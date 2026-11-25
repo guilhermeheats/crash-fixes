@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.5.0 — Integrated-server Far view distance
+
+- `clchunkfix-1.6.jar` raises the integrated-server view distance to 16 chunks
+  on server start, matching the client's Far render distance.
+- Fixes the band of unloaded chunks at the edge when the client is set to Far
+  but the integrated server keeps its smaller default view distance.
+- The client FPS is not limited; the trade-off is more chunk generation,
+  chunk loading and memory use.
+- Optional JVM property `-Dclchunkfix.serverViewDistance=<3-16>`; default 16.
+- Recommended for Far: 5–6 GB heap (the real session was using about 4.25 GB
+  RSS with a 4 GB heap) and no heavy browser in the background.
+- The expected log line is
+  `[CLWorldFix] Set integrated-server view distance to 16 chunks.`
+- Installers remove older `clchunkfix-1.0` through `1.5`.
+- No pack, mod, recipe, loot or world data is redistributed or changed.
+
 ## v2.4.0 — Dropped-item render distance
 
 - `clchunkfix-1.5.jar` raises the client-side render distance of dropped item

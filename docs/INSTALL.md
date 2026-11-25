@@ -54,7 +54,7 @@ Keep the current video settings:
 
 The installer:
 
-1. copies `legacyjavafixer-1.0.jar` and `clchunkfix-1.5.jar` to `mods/`;
+1. copies `legacyjavafixer-1.0.jar` and `clchunkfix-1.6.jar` to `mods/`;
 2. backs up and applies `examples/options.txt` (unless `--no-options`);
 3. fixes the CustomChestLoot configs;
 4. disables obsolete update/radio checks;
@@ -81,7 +81,7 @@ Keep the current video settings:
 Copy into `mods/`:
 
 - `mods/legacyjavafixer-1.0.jar`
-- `mods/clchunkfix-1.5.jar`
+- `mods/clchunkfix-1.6.jar`
 
 Then apply config fixes:
 
@@ -117,6 +117,8 @@ Set these in the launcher's Java/JVM arguments field:
 ```
 
 Optional: add `-Dclchunkfix.itemRenderDistance=48` to lower the dropped-item render distance (default 64, range 16–64; the client cutoff is the value plus a 1-block camera margin).
+
+For **Far + the 16-chunk server view distance**, use a **5–6 GB heap** (`-Xms5120m -Xmx6144m` or 6144 MB in the launcher) and close heavy background apps. The 4 GB profile is the baseline; the real session was at about 4.25 GB RSS with a 4 GB heap.
 
 Menu names vary:
 
