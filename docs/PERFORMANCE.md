@@ -31,6 +31,9 @@ Java 8u202 64-bit
 -XX:+PerfDisableSharedMem
 ```
 
+The recorded baseline is 4 GB. The Far + 16-chunk real session used
+`-Xms6144m -Xmx6144m` (6144 MB); see the view-distance section.
+
 Crash Landing is mostly CPU/mod-bound. The 2015 rendering and entity logic dominate; the GPU is rarely the limiting factor at normal render distances.
 
 ## Dropped-item render distance (1.5)
@@ -48,20 +51,26 @@ margin.
 - The change is visual only; pickup range, physics, despawn and server tracking
   are unchanged.
 
-## Integrated-server Far view distance (1.6)
+## Integrated-server Far view distance (1.8)
 
 The client can render Far (16 chunks), but the integrated server's default view
-distance is smaller (10 chunks). `clchunkfix-1.6.jar` raises it to 16 on server
+distance is smaller (10 chunks). `clchunkfix-1.8.jar` raises it to 16 on server
 start.
 
-- No FPS limit; the client still renders at the selected framerate.
-- The trade-off is more chunk generation, loading and memory. The real session
-  was using about 4.25 GB RSS with a 4 GB heap; for Far + 16 chunks, use 5–6 GB
-  and close the browser/background apps.
+- 1.6 and 1.7 failed to find the field at runtime; the manager object is a
+  subclass of `ServerConfigurationManager`, and the first attempts inspected
+  only the concrete class. 1.8 walks the class hierarchy and sets
+  `ServerConfigurationManager.field_72402_d` from `10` to `17`.
+- No FPS limit; the client still renders at the selected framerate. The real
+  `New World` test ran at 120 FPS with a 6144 MB heap.
+- The trade-off is more chunk generation, loading and memory. For Far + 16
+  chunks, use 6144 MB (the real test) and close the browser/background apps.
 - Optional `-Dclchunkfix.serverViewDistance=8` lowers the server view distance;
   with the client still on Far, a band at 8 chunks would remain.
 - Expected log:
-  `[CLWorldFix] Set integrated-server view distance to 16 chunks.`
+  `[CLWorldFix] Set integrated-server view distance to 16 chunks (field ServerConfigurationManager.field_72402_d, 10 -> 17).`
+- The real test showed F3 `C:` total `1081`, no `Can't keep up!` and no
+  `Invalid blockID` after the load.
 
 ## `Can't keep up!` warnings
 
@@ -70,8 +79,10 @@ A GC log from the test copy showed a maximum stop-the-world pause of 0.066 s at
 startup, so the warnings were not a single long GC pause. They were transient
 server-tick spikes; the pattern is consistent with chunk generation or mob
 pathfinding. The real session was also at about 4.25 GB RSS with a 4 GB heap,
-so GC pressure under load is likely to contribute. Use 5–6 GB for Far/16
-chunks and close background applications. No crash report was created.
+so GC pressure under load is likely to contribute. Use 6144 MB for Far/16
+chunks and close background applications. In the 1.8 real `New World` test
+with 6144 MB, no `Can't keep up!` line appeared after the load. No crash report
+was created.
 
 ## OptiFine 1.6.4
 
@@ -104,8 +115,10 @@ OptiFine's license also forbids modifying/redistributing the jar. See `docs/LEGA
 - Lower Render Distance to Normal/Short.
 - Test fullscreen vs windowed.
 - Use the discrete GPU on hybrid laptops (the launcher's GPU option, or `DRI_PRIME=1` on Linux).
-- Close background applications; the instance uses a 4 GB heap.
-- Do not raise the heap above 5 GB without evidence; larger heaps can increase GC pauses.
+- Close background applications; the Far + 16-chunk profile uses 6144 MB, while
+  4 GB is the baseline for lower render distances.
+- Do not raise the heap above 6 GB without evidence; larger heaps can increase
+  GC pauses.
 
 ## Hardcore fidelity
 

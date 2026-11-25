@@ -35,7 +35,7 @@ jobs:
           tmp="$(mktemp -d)"
           mkdir -p "$tmp/mods" "$tmp/config"
           ./scripts/install.sh --game-dir "$tmp" --no-options
-          test -f "$tmp/mods/clchunkfix-1.6.jar"
+          test -f "$tmp/mods/clchunkfix-1.8.jar"
           test -f "$tmp/mods/legacyjavafixer-1.0.jar"
 
       - name: Build clchunkfix (Linux/macOS)
@@ -45,12 +45,12 @@ jobs:
           curl -fsSL -o "$RUNNER_TEMP/forge.jar" \
             https://maven.minecraftforge.net/net/minecraftforge/forge/1.6.4-9.11.1.965/forge-1.6.4-9.11.1.965-universal.jar
           FORGE_JAR="$RUNNER_TEMP/forge.jar" ./scripts/build.sh
-          test -f mods/clchunkfix-1.6.jar
-          unzip -l mods/clchunkfix-1.6.jar | grep -q 'clchunkfix/core/WorldExtensionTransformer.class'
-          unzip -l mods/clchunkfix-1.6.jar | grep -q 'clchunkfix/core/InvTweaksTransformer.class'
-          unzip -l mods/clchunkfix-1.6.jar | grep -q 'clchunkfix/core/HqmTransformer.class'
-          unzip -l mods/clchunkfix-1.6.jar | grep -q 'clchunkfix/core/ItemRenderTransformer.class'
-          unzip -p mods/clchunkfix-1.6.jar META-INF/MANIFEST.MF | grep -q 'FMLCorePlugin: clchunkfix.core.ChunkFixCorePlugin'
+          test -f mods/clchunkfix-1.8.jar
+          unzip -l mods/clchunkfix-1.8.jar | grep -q 'clchunkfix/core/WorldExtensionTransformer.class'
+          unzip -l mods/clchunkfix-1.8.jar | grep -q 'clchunkfix/core/InvTweaksTransformer.class'
+          unzip -l mods/clchunkfix-1.8.jar | grep -q 'clchunkfix/core/HqmTransformer.class'
+          unzip -l mods/clchunkfix-1.8.jar | grep -q 'clchunkfix/core/ItemRenderTransformer.class'
+          unzip -p mods/clchunkfix-1.8.jar META-INF/MANIFEST.MF | grep -q 'FMLCorePlugin: clchunkfix.core.ChunkFixCorePlugin'
 
       - name: Verify repository (Windows)
         if: runner.os == 'Windows'
@@ -77,7 +77,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path (Join-Path $tmp "mods") | Out-Null
           New-Item -ItemType Directory -Force -Path (Join-Path $tmp "config") | Out-Null
           .\scripts\install.ps1 -GameDir $tmp -NoOptions
-          if (-not (Test-Path (Join-Path $tmp "mods\clchunkfix-1.6.jar"))) { throw "missing clchunkfix" }
+          if (-not (Test-Path (Join-Path $tmp "mods\clchunkfix-1.8.jar"))) { throw "missing clchunkfix" }
           if (-not (Test-Path (Join-Path $tmp "mods\legacyjavafixer-1.0.jar"))) { throw "missing legacyjavafixer" }
 
       - name: Build clchunkfix (Windows)
@@ -85,8 +85,8 @@ jobs:
         shell: pwsh
         run: |
           .\scripts\build.ps1
-          if (-not (Test-Path mods/clchunkfix-1.6.jar)) { throw "jar not built" }
-          $entries = & jar tf mods/clchunkfix-1.6.jar
+          if (-not (Test-Path mods/clchunkfix-1.8.jar)) { throw "jar not built" }
+          $entries = & jar tf mods/clchunkfix-1.8.jar
           if (-not ($entries -contains "clchunkfix/core/WorldExtensionTransformer.class")) {
             throw "CodeChickenLib transformer missing from clchunkfix jar"
           }

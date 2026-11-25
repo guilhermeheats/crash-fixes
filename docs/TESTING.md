@@ -239,21 +239,26 @@ To close that last gap, either:
   `Can't keep up!` warning appeared in the test session.
 - Real instance: `clchunkfix-1.5.jar` installed; `verify-game-dir` PASS.
 
-## Integrated-server Far view distance validation (v1.6)
+## Integrated-server Far view distance validation (v1.8)
 
 Validation steps on the real instance:
 
-1. Install `clchunkfix-1.6.jar` and restart the world so
+1. Install `clchunkfix-1.8.jar` and restart the world so
    `FMLServerStartedEvent` runs.
 2. Confirm the log line
-   `[CLWorldFix] Set integrated-server view distance to 16 chunks.`
+   `[CLWorldFix] Set integrated-server view distance to 16 chunks (field ServerConfigurationManager.field_72402_d, 10 -> 17).`
 3. Press F3 and check the `C:` loaded-chunk count. It should cover the
    16-chunk radius instead of the smaller default; the band at the old edge
    should be gone.
 4. Keep the client FPS unlimited; the fix does not cap FPS.
-5. Use a 5–6 GB heap and close background applications. The real session was
-   using about 4.25 GB RSS with a 4 GB heap, which is tight for Far plus
-   16-chunk chunk loading.
+5. Use a 6144 MB heap and close background applications. The real test used
+   6144 MB and F3 showed `C: .../1081` (16-chunk radius); no `Can't keep up!`
+   or `Invalid blockID` appeared after the load.
+
+History: 1.6 failed with `Could not find server view distance field`; 1.7
+printed an empty `ints:` list because it inspected only the concrete manager
+class. 1.8 walks the hierarchy and finds
+`ServerConfigurationManager.field_72402_d`.
 
 ## CI workflows
 

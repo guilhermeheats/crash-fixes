@@ -40,7 +40,7 @@ Caused by: java.io.IOException: No such file or directory
 
 Cause: Crash Landing deletes the hardcore world on death. ChickenChunks stores the save directory in a static field. When a new world is created in the same game session, the old directory is used and the file creation fails.
 
-Fix: `clchunkfix-1.6.jar` listens for `FMLServerStoppedEvent` and calls the public `ChunkLoaderManager.serverShutdown()`. The next world load recalculates its `saveDir`.
+Fix: `clchunkfix-1.8.jar` listens for `FMLServerStoppedEvent` and calls the public `ChunkLoaderManager.serverShutdown()`. The next world load recalculates its `saveDir`.
 
 ## 3. Ruins `RuinsPositionsFile.txt`
 
@@ -52,7 +52,7 @@ java.io.FileNotFoundException: .../saves/Crash Landing 3/RuinsPositionsFile.txt 
 
 Cause: Ruins 11.0 caches `WorldHandle`/`RuinGenerator` instances per dimension in `generatorMap`. After a world switch, the new world reuses the old generator and points to the deleted world's positions file.
 
-Fix: `clchunkfix-1.6.jar` clears the private `generatorMap` of `atomicstryker.ruins.common.RuinsMod` on `FMLServerStopped`. The next world creates fresh handlers.
+Fix: `clchunkfix-1.8.jar` clears the private `generatorMap` of `atomicstryker.ruins.common.RuinsMod` on `FMLServerStopped`. The next world creates fresh handlers.
 
 Expected log after stopping a world:
 
@@ -76,7 +76,7 @@ In game this looks like a frozen world: mobs stop moving and chests no longer op
 
 Cause: CodeChickenLib 1.0.0.62 iterates `worldMap.get(world)` without a null check. The map is populated by `WorldEvent.Load`; if a world tick arrives without that entry (or after it was removed), the loop throws.
 
-Fix: `clchunkfix-1.6.jar` contains a small coremod. It injects a guard at the start of `preTick`/`postTick`; the guard creates the missing `WorldExtension[]` through CodeChickenLib's own `onWorldLoad`, or installs an empty array if that fails. The server keeps ticking instead of crashing. The guard logs one of:
+Fix: `clchunkfix-1.8.jar` contains a small coremod. It injects a guard at the start of `preTick`/`postTick`; the guard creates the missing `WorldExtension[]` through CodeChickenLib's own `onWorldLoad`, or installs an empty array if that fails. The server keeps ticking instead of crashing. The guard logs one of:
 
 ```text
 [CLWorldFix] Created missing CodeChickenLib world extensions on demand.
@@ -98,7 +98,7 @@ java.lang.IndexOutOfBoundsException: Index: 55, Size: 45
 
 In game this appears as a lagging/desynchronised chest: blocks and items roll back, item pickup is delayed, and the chest GUI stops responding. The integrated server has already returned to the player inventory (45 slots), but the client still has a chest GUI open and Inventory Tweaks sends a click for a chest/player slot that no longer exists.
 
-Fix: `clchunkfix-1.6.jar` adds a coremod guard at the start of `PacketHandler.onClickPacket`. It reads the requested slot from the packet, compares it with the server container size, and drops the click if it is out of range. It also closes the stale GUI so the next interaction reopens the chest cleanly.
+Fix: `clchunkfix-1.8.jar` adds a coremod guard at the start of `PacketHandler.onClickPacket`. It reads the requested slot from the packet, compares it with the server container size, and drops the click if it is out of range. It also closes the stale GUI so the next interaction reopens the chest cleanly.
 
 Expected log when an invalid click is blocked:
 
@@ -127,7 +127,7 @@ OreDictionary precision it calls `OreDictionary.getOreID` for each comparison;
 that method scans the entire ore dictionary. A large inventory plus many quest
 items makes the server thread spend seconds in this loop.
 
-Fix: `clchunkfix-1.6.jar` replaces HQM's direct `getOreID` calls with a
+Fix: `clchunkfix-1.8.jar` replaces HQM's direct `getOreID` calls with a
 per-`ItemStack` weak cache. The first lookup is unchanged; repeated comparisons
 of the same stack are constant-time. Quest definitions, progress and matching
 semantics are unchanged.
@@ -169,7 +169,7 @@ distance^2 < (boundingBox.getAverageEdgeLength() * 64 * renderDistanceWeight)^2
 entities within 64 blocks, so the item is present on the client but never
 rendered beyond 16 blocks.
 
-Fix: `clchunkfix-1.6.jar` adds a coremod override of
+Fix: `clchunkfix-1.8.jar` adds a coremod override of
 `EntityItem.func_70112_a(D)Z` (the SRG name of `isInRangeToRenderDist`; the
 transformer also handles the pre-deobfuscation `a(D)Z`). The override keeps
 items visible up to the 64-block server tracking limit plus a 1-block margin
@@ -202,16 +202,27 @@ server sends chunks only within its own view distance; the outer band is never
 sent. The client can render 16 chunks, but the server field stays at the
 default value.
 
-Fix: `clchunkfix-1.6.jar` listens for `FMLServerStartedEvent` and raises
+Fix: `clchunkfix-1.8.jar` listens for `FMLServerStartedEvent` and raises
 `ServerConfigurationManager.field_72402_d` to `16 + 1`; `PlayerManager`
 converts it to `16 * 16 = 256` blocks. The client Far (16 chunks) and the
 server view distance now match.
 
+The first attempts (1.6/1.7) failed because the runtime manager object is a
+subclass of `ServerConfigurationManager`; 1.6 looked for the field only in the
+concrete class, and 1.7's dynamic lookup also inspected only that class, so the
+log showed `Could not find server view distance field` with an empty `ints:`
+list. 1.8 walks the class hierarchy, finds the field by name, and logs the
+declaring class and the old/new values.
+
 Expected log:
 
 ```text
-[CLWorldFix] Set integrated-server view distance to 16 chunks.
+[CLWorldFix] Set integrated-server view distance to 16 chunks (field ServerConfigurationManager.field_72402_d, 10 -> 17).
 ```
+
+In the real `New World`, F3 showed a `C:` total of 1081 (16-chunk radius), the
+client stayed at 120 FPS with no cap, and no `Can't keep up!` or
+`Invalid blockID` lines appeared after the load.
 
 Optional: `-Dclchunkfix.serverViewDistance=8` (3–16, default 16). This lowers
 the server view distance; with the client still on Far, a band at 8 chunks

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="1.6"
+VERSION="1.8"
 JAR_NAME="clchunkfix-${VERSION}.jar"
 FORGE_JAR="${FORGE_JAR:-}"
 ASM_JAR="${ASM_JAR:-$ROOT/build/asm-all-4.1.jar}"
@@ -72,7 +72,7 @@ cp -r "$ROOT/build/classes/." "$ROOT/build/jar/"
     zip -q -r "$ROOT/build/$JAR_NAME" .
 )
 
-rm -f "$ROOT/mods/clchunkfix-1.0.jar" "$ROOT/mods/clchunkfix-1.1.jar" "$ROOT/mods/clchunkfix-1.2.jar" "$ROOT/mods/clchunkfix-1.3.jar" "$ROOT/mods/clchunkfix-1.4.jar" "$ROOT/mods/clchunkfix-1.5.jar"
+rm -f "$ROOT/mods/clchunkfix-1.0.jar" "$ROOT/mods/clchunkfix-1.1.jar" "$ROOT/mods/clchunkfix-1.2.jar" "$ROOT/mods/clchunkfix-1.3.jar" "$ROOT/mods/clchunkfix-1.4.jar" "$ROOT/mods/clchunkfix-1.5.jar" "$ROOT/mods/clchunkfix-1.6.jar" "$ROOT/mods/clchunkfix-1.7.jar"
 cp "$ROOT/build/$JAR_NAME" "$ROOT/mods/$JAR_NAME"
 
 for class_file in \

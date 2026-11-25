@@ -39,7 +39,7 @@ import java.util.Map;
  *    the client can render Far (16), leaving a band of unloaded chunks at the
  *    edge; raise the server view distance to 16 on server start
  */
-@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.6")
+@Mod(modid = "clchunkfix", name = "Crash Landing World Switch Fixes", version = "1.8")
 public class ChunkFix {
 
     @Mod.EventHandler
@@ -69,29 +69,106 @@ public class ChunkFix {
             }
 
             Object manager = getConfigurationManager.invoke(server);
-            Field viewDistance = null;
-            for (Field field : manager.getClass().getDeclaredFields()) {
-                if (field.getType() == int.class
-                        && ("field_72402_d".equals(field.getName()) || "c".equals(field.getName()))) {
-                    viewDistance = field;
-                    break;
+
+            // The runtime field name differs between FML remapping modes. Read
+            // getViewDistance() first, then find the int field that stores
+            // viewDistance + 1. PlayerManager converts it back to * 16 blocks.
+            int currentViewDistance = -1;
+            try {
+                Method getViewDistance = manager.getClass().getMethod("func_72372_a");
+                Object value = getViewDistance.invoke(manager);
+                if (value instanceof Integer) {
+                    currentViewDistance = (Integer) value;
+                }
+            } catch (Throwable ignored) {
+            }
+            if (currentViewDistance < 0) {
+                for (Method method : manager.getClass().getMethods()) {
+                    if (method.getParameterTypes().length != 0 || method.getReturnType() != int.class) {
+                        continue;
+                    }
+                    try {
+                        Object value = method.invoke(manager);
+                        if (value instanceof Integer && (Integer) value > 16) {
+                            currentViewDistance = (Integer) value;
+                            break;
+                        }
+                    } catch (Throwable ignored) {
+                    }
                 }
             }
+
+            int currentChunksPlusOne = currentViewDistance >= 0
+                    ? currentViewDistance / 16 + 1
+                    : -1;
+            Field viewDistance = findViewDistanceField(manager, currentChunksPlusOne);
             if (viewDistance == null) {
-                System.out.println("[CLWorldFix] Could not find server view distance field.");
                 return;
             }
 
             int chunks = configuredServerViewDistance();
             viewDistance.setAccessible(true);
-            // ServerConfigurationManager stores viewDistance + 1; PlayerManager
-            // converts it back to (viewDistance) * 16 blocks.
+            int oldValue = viewDistance.getInt(manager);
             viewDistance.setInt(manager, chunks + 1);
             System.out.println("[CLWorldFix] Set integrated-server view distance to "
-                    + chunks + " chunks.");
+                    + chunks + " chunks (field "
+                    + viewDistance.getDeclaringClass().getSimpleName() + "."
+                    + viewDistance.getName() + ", "
+                    + oldValue + " -> " + (chunks + 1) + ").");
         } catch (Throwable t) {
             System.out.println("[CLWorldFix] Could not set server view distance: " + t);
         }
+    }
+
+    private static Field findViewDistanceField(Object manager, int currentChunksPlusOne) {
+        Class<?> type = manager.getClass();
+        while (type != null && type != Object.class) {
+            for (Field field : type.getDeclaredFields()) {
+                if (field.getType() != int.class) {
+                    continue;
+                }
+                try {
+                    field.setAccessible(true);
+                    if (field.getInt(manager) == currentChunksPlusOne) {
+                        return field;
+                    }
+                } catch (Throwable ignored) {
+                }
+            }
+            type = type.getSuperclass();
+        }
+
+        type = manager.getClass();
+        while (type != null && type != Object.class) {
+            for (Field field : type.getDeclaredFields()) {
+                if (field.getType() == int.class
+                        && ("field_72402_d".equals(field.getName()) || "c".equals(field.getName()))) {
+                    field.setAccessible(true);
+                    return field;
+                }
+            }
+            type = type.getSuperclass();
+        }
+
+        StringBuilder fields = new StringBuilder();
+        type = manager.getClass();
+        while (type != null && type != Object.class) {
+            for (Field field : type.getDeclaredFields()) {
+                if (field.getType() == int.class) {
+                    try {
+                        field.setAccessible(true);
+                        fields.append(field.getDeclaringClass().getSimpleName()).append('.')
+                                .append(field.getName()).append('=')
+                                .append(field.getInt(manager)).append(' ');
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
+            type = type.getSuperclass();
+        }
+        System.out.println("[CLWorldFix] Could not find server view distance field. ints: "
+                + fields);
+        return null;
     }
 
     @Mod.EventHandler

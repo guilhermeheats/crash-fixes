@@ -7,7 +7,7 @@ The verifier works on any Minecraft **game directory**; it does not need launche
 `checksums.txt` covers:
 
 - `mods/legacyjavafixer-1.0.jar`
-- `mods/clchunkfix-1.6.jar`
+- `mods/clchunkfix-1.8.jar`
 - `mods.sha256`
 
 Linux/macOS:
@@ -55,7 +55,7 @@ Windows:
 It checks:
 
 - `mods/` exists and `config/` is present (warning if missing);
-- `legacyjavafixer-1.0.jar` and `clchunkfix-1.6.jar`;
+- `legacyjavafixer-1.0.jar` and `clchunkfix-1.8.jar`;
 - every mod against `mods.sha256`;
 - missing/extra mods;
 - `options.txt` against `examples/options.txt` (warning only);

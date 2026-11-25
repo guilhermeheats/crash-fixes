@@ -1,5 +1,30 @@
 # Changelog
 
+## v2.5.1 — View-distance field lookup fix
+
+- `clchunkfix-1.8.jar` fixes the integrated-server view distance patch that
+  shipped in 1.6 and 1.7.
+- 1.6 failed in the real instance with
+  `[CLWorldFix] Could not find server view distance field.`
+- 1.7 tried to infer the field from `getViewDistance()`, but the runtime
+  manager object is a subclass of `ServerConfigurationManager`; inspecting only
+  the concrete class returned no `int` fields (`ints:` was empty).
+- 1.8 walks the full class hierarchy, finds
+  `ServerConfigurationManager.field_72402_d`, and sets it from the default
+  `10` to `17` (16 chunks after the `PlayerManager` conversion).
+- Verified in the real `New World`:
+  - log:
+    `[CLWorldFix] Set integrated-server view distance to 16 chunks (field ServerConfigurationManager.field_72402_d, 10 -> 17).`
+  - F3 `C:` total `1081` (16-chunk radius) instead of the smaller default.
+  - 6144 MB heap; 120 FPS with no FPS cap.
+  - no `Can't keep up!` and no `Invalid blockID` since the load.
+- Local `farm.tml` workaround: `rule13=0,100,2763-4` (Chisel marble slab),
+  with backups. New farms no longer log `Invalid blockID 2261`; existing
+  farms may still have the 2-block air gap and can be filled manually.
+- Installers remove older `clchunkfix-1.0` through `1.7`.
+- Release `v2.5.0` (1.6) is superseded; use `v2.5.1`/`1.8`.
+- No pack, mod, recipe, loot or world data is redistributed or changed.
+
 ## v2.5.0 — Integrated-server Far view distance
 
 - `clchunkfix-1.6.jar` raises the integrated-server view distance to 16 chunks
@@ -14,6 +39,8 @@
 - The expected log line is
   `[CLWorldFix] Set integrated-server view distance to 16 chunks.`
 - Installers remove older `clchunkfix-1.0` through `1.5`.
+- **Superseded by v2.5.1:** the 1.6 field lookup failed in the real instance
+  (`Could not find server view distance field`); use `clchunkfix-1.8.jar`.
 - No pack, mod, recipe, loot or world data is redistributed or changed.
 
 ## v2.4.0 — Dropped-item render distance
